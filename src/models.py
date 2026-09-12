@@ -142,22 +142,22 @@ class Candidate:
         }
 
     def to_llm_payload(self, max_description_chars: int) -> dict[str, Any]:
-        """交给 LLM 的最小结构化字段（不含 README、不含任何指令性内容）。"""
+        """交给 LLM 的最小结构化字段（不含 README、不含任何指令性内容）。
+
+        字段刻意精简：输入越小，免费档的 TPM 压力越低、出首个 token 越快。
+        """
         from .util import sanitize_text
 
         return {
             "full_name": self.full_name,
             "description": sanitize_text(self.description, max_description_chars),
             "language": self.language or "unknown",
-            "topics": self.topics[:20],
+            "topics": self.topics[:12],
             "stars": self.stars,
             "stars_today": self.stars_today,
             "stars_this_week": self.stars_this_week,
             "stars_today_source": self.velocity_source,
             "forks": self.forks,
-            "created_at": self.created_at,
-            "pushed_at": self.pushed_at,
-            "has_release": self.has_release,
             "latest_release_at": self.latest_release_at,
             "first_seen": self.first_seen,
             "trending_streak_days": self.trending_streak_days,

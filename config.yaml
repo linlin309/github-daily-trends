@@ -10,7 +10,7 @@ report:
   target_count: 10              # 最终数量上限（≤10，不是必须 10）
   hard_floor: 35.0              # 质量下限：调整后分数低于此值不再入选
   title_prefix: "【GitHub 每日软件趋势】"
-  max_description_chars: 300     # 交给 LLM 的描述截断长度
+  max_description_chars: 220     # 交给 LLM 的描述截断长度（越小越省 token、越快）
 
 paths:
   reports_dir: reports
@@ -276,24 +276,33 @@ selection:
 # ---------------------------------------------------------------------------
 llm:
   temperature: 0.3
-  max_output_tokens: 3000
-  timeout_seconds: 120
+  max_output_tokens: 1500         # 输出上限；越小越快（生成时间 ≈ 输出 token 数），也越不容易超时
+  connect_timeout_seconds: 15
+  timeout_seconds: 240            # 读超时：生成式模型很慢，且空闲免费档可能几十秒才返回第一个 token
+  retry_backoff_seconds: 15       # 重试前等待基数（免费档并发常常是 1，立刻重试会再次被限流）
   max_retries_per_provider: 2     # 每个 provider 最多尝试次数（第 2 次是 JSON 修复）
   max_calls_total: 3              # 硬上限：1 次主调用 + 1 次 JSON 修复 + 1 次切换备用 Provider；正常情况只用 1 次
   prompt_file: prompts/analyze.md
   allowed_tags: [今日最值得关注, 今日最实用, 今日潜力项目]
-  max_field_chars: 80
-  max_one_liner_chars: 40
+  max_field_chars: 60
+  max_one_liner_chars: 30
   injection_markers: ["ignore previous instructions", "ignore all previous", "disregard previous", "system prompt", "you are now", "忽略以上指令", "忽略之前的指令", "忽略上述", "现在你是", "system:"]
   providers:
     - name: zhipu
       base_url: ${LLM_BASE_URL}
       model: ${LLM_MODEL}
       api_key: ${LLM_API_KEY}
+      # 智谱 GLM-4.7 系列默认「开启 Thinking」，会先生成长段推理再输出正文，
+      # 这既拖长生成时间也增加 token 消耗。日报只需要"总结 + 短字段"，
+      # 因此显式关闭（官方文档：capabilities/thinking-mode，参数 thinking.type）。
+      extra_body:
+        thinking:
+          type: disabled
     - name: openrouter
       base_url: ${LLM_FALLBACK_BASE_URL}
       model: ${LLM_FALLBACK_MODEL}
       api_key: ${LLM_FALLBACK_API_KEY}
+      # 备用 Provider 不传厂商专属参数（不同 OpenAI 兼容服务对未知字段的容忍度不同）
 
 # ---------------------------------------------------------------------------
 # 邮件：163 邮箱。用 465 + SSL（GitHub Actions 出站 25 端口被封）。

@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import time
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from pathlib import Path
@@ -69,8 +70,12 @@ class LLMAnalyzer:
         self.log = logger or logging.getLogger("llm")
         self.root = project_root or Path(__file__).resolve().parents[1]
         self.temperature = float(cfg.get("temperature", 0.3))
-        self.max_output_tokens = int(cfg.get("max_output_tokens", 3000))
-        self.timeout = float(cfg.get("timeout_seconds", 120))
+        self.max_output_tokens = int(cfg.get("max_output_tokens", 1500))
+        # 生成式模型（尤其默认开启 Thinking 的模型）很慢：读超时必须足够大，
+        # 且要真正传给 HTTP 层（早期版本这里读了配置却没传，等于只有 30 秒）。
+        self.connect_timeout = float(cfg.get("connect_timeout_seconds", 15))
+        self.read_timeout = float(cfg.get("timeout_seconds", 240))
+        self.retry_backoff = float(cfg.get("retry_backoff_seconds", 15))
         self.max_retries = int(cfg.get("max_retries_per_provider", 2))
         self.max_calls_total = int(cfg.get("max_calls_total", 2))
         self.allowed_tags = list(cfg.get("allowed_tags") or [])
@@ -100,14 +105,14 @@ class LLMAnalyzer:
         prompt = self._render_prompt(projects_json, len(projects), today)
 
         result = AnalysisResult()
-        last_error = ""
+        errors: list[str] = []
         for provider in self.cfg.get("providers") or []:
             if self.calls >= self.max_calls_total:
                 break
             result.provider, result.model = provider.get("name"), provider.get("model")
             payload, error = self._call_provider(provider, prompt, projects_json)
             if payload is None:
-                last_error = error
+                errors.append(f"{provider.get('name')}: {error}")
                 self.log.warning("Provider %s 调用失败: %s", provider.get("name"), error)
                 continue
 
@@ -123,13 +128,29 @@ class LLMAnalyzer:
             return result
 
         result.ok = False
-        result.degraded_reason = last_error or "所有 LLM Provider 均不可用"
+        result.degraded_reason = "; ".join(errors) or "所有 LLM Provider 均不可用"
         result.calls = self.calls
         result.tokens = dict(self.tokens_total)
         self._apply_fallback(projects)
         return result
 
     # ------------------------------------------------------------------ 调用
+    # 可重试 / 不可重试的 HTTP 状态
+    RETRYABLE_STATUS = (429, 500, 502, 503, 504)
+    FATAL_STATUS = (400, 401, 403, 404, 422)
+
+    # 参考提示（非权威，以服务端返回的 message 为准），便于快速定位 429 的真正原因
+    ERROR_HINTS = {
+        "1302": "并发或频率超限",
+        "1303": "并发超限",
+        "1304": "调用频率超限",
+        "1305": "服务过载，稍后重试即可",
+        "1308": "额度已用尽（该模型可能对当前账号不免费）",
+        "1310": "周期额度已用尽",
+        "1113": "账户余额不足（该模型可能并非免费模型）",
+        "1214": "模型不存在或未开通，请核对 LLM_MODEL",
+    }
+
     def _call_provider(
         self, provider: dict, prompt: str, projects_json: str
     ) -> tuple[dict[str, Any] | None, str]:
@@ -139,39 +160,79 @@ class LLMAnalyzer:
             "Authorization": f"Bearer {provider.get('api_key')}",
             "Content-Type": "application/json",
         }
+        extra_body = provider.get("extra_body") or {}
         messages = [{"role": "user", "content": prompt}]
         error = ""
 
         for attempt in range(1, self.max_retries + 1):
             if self.calls >= self.max_calls_total:
-                return None, f"已达到调用次数上限({self.max_calls_total})"
-            body = {
+                # 优先返回真实原因，而不是"到达上限"这种无信息量的结论
+                return None, error or f"已达到调用次数上限({self.max_calls_total})"
+            body: dict[str, Any] = {
                 "model": provider.get("model"),
                 "messages": messages,
                 "temperature": self.temperature,
                 "max_tokens": self.max_output_tokens,
             }
+            # provider 专属参数（例如智谱的 thinking 开关）走配置透传，代码不绑定厂商
+            body.update(extra_body)
+
             self.calls += 1
+            started = time.monotonic()
             try:
                 response = self.http.request(
                     "POST",
                     url,
                     headers=headers,
                     json_body=body,
-                    allow_status=(200,),
-                    max_sleep_seconds=20.0,
+                    allow_status=(200,) + self.FATAL_STATUS + self.RETRYABLE_STATUS,
+                    max_sleep_seconds=10.0,
+                    timeout=(self.connect_timeout, self.read_timeout),
                 )
             except HttpError as exc:
-                error = f"HTTP 调用失败: {exc}"
+                error = f"网络/HTTP 层失败: {exc}"
+                self._sleep_before_retry(attempt, why=error)
                 continue
             except Exception as exc:  # noqa: BLE001 - 网络层以外的异常也要降级，不能拖垮日报
-                error = f"调用异常: {exc}"
+                error = f"调用异常: {type(exc).__name__}: {exc}"
+                self._sleep_before_retry(attempt, why=error)
+                continue
+
+            elapsed = time.monotonic() - started
+
+            if response.status_code != 200:
+                error = self._describe_error(response)
+                # 自愈：若厂商不接受我们的 extra_body（例如某模型不支持 thinking 字段），
+                # 去掉它再试一次，而不是直接降级。
+                if response.status_code in (400, 422) and extra_body:
+                    self.log.warning(
+                        "Provider %s 不接受 extra_body %s（%s），去掉该参数重试一次",
+                        provider.get("name"),
+                        json.dumps(extra_body, ensure_ascii=False),
+                        error,
+                    )
+                    extra_body = {}
+                    continue
+                if response.status_code in self.FATAL_STATUS:
+                    # 参数/鉴权/模型名错误：重试没有意义，直接暴露给上层
+                    self.log.error("Provider %s 返回不可重试错误（%.1fs）：%s", provider.get("name"), elapsed, error)
+                    return None, error
+                self.log.warning(
+                    "Provider %s 第 %d/%d 次失败（%.1fs）：%s",
+                    provider.get("name"),
+                    attempt,
+                    self.max_retries,
+                    elapsed,
+                    error,
+                )
+                self._sleep_before_retry(attempt, why="限流或服务端错误")
                 continue
 
             try:
                 payload = response.json()
             except ValueError:
                 error = "响应不是 JSON"
+                self._sleep_before_retry(attempt, why=error)
                 continue
 
             usage = payload.get("usage") or {}
@@ -180,15 +241,25 @@ class LLMAnalyzer:
 
             content = self._content_of(payload)
             if not content:
-                error = "响应中没有文本内容"
+                error = f"响应中没有文本内容（finish_reason={self._finish_reason(payload)}）"
+                self.log.warning("%s", error)
+                self._sleep_before_retry(attempt, why=error)
                 continue
 
             parsed = _extract_json(content)
             if parsed is not None:
+                self.log.info(
+                    "LLM 调用成功：provider=%s 耗时 %.1fs，本次 tokens in/out=%s/%s，全文 %d 字",
+                    provider.get("name"),
+                    elapsed,
+                    self.tokens_total["in"],
+                    self.tokens_total["out"],
+                    len(content),
+                )
                 return parsed, ""
 
             # JSON 修复：只允许一次
-            error = "输出不是合法 JSON"
+            error = f"输出不是合法 JSON（前 120 字：{sanitize_text(content, 120)}）"
             self.log.warning("输出非 JSON，尝试修复（第 %d 次）", attempt)
             messages = [
                 {"role": "user", "content": prompt},
@@ -196,6 +267,46 @@ class LLMAnalyzer:
                 {"role": "user", "content": "上面的输出不是合法 JSON。请只输出符合要求的 JSON 对象，不要任何解释或代码块围栏。"},
             ]
         return None, error
+
+    def _sleep_before_retry(self, attempt: int, *, why: str) -> None:
+        """重试前必须等待：免费档并发常常是 1，立刻重试只会再次被限流。"""
+        if self.calls >= self.max_calls_total:
+            return
+        delay = min(self.retry_backoff * attempt, 60.0)
+        self.log.info("%s → 等待 %.0fs 后重试", why, delay)
+        time.sleep(delay)
+
+    def _describe_error(self, response) -> str:
+        """把服务端的错误原文带出来（只说 HTTP 429 无法定位原因）。"""
+        status = response.status_code
+        code = message = ""
+        try:
+            payload = response.json()
+        except ValueError:
+            payload = None
+        if isinstance(payload, dict):
+            err = payload.get("error")
+            if isinstance(err, dict):
+                code = str(err.get("code") or err.get("type") or "")
+                message = str(err.get("message") or "")
+            elif err:
+                message = str(err)
+            if not message:
+                message = str(payload.get("message") or payload.get("msg") or "")
+        if not message and not code:
+            message = sanitize_text(getattr(response, "text", ""), 200)
+        hint = self.ERROR_HINTS.get(code)
+        detail = f"code={code} message={message}" if code else f"message={message}"
+        if hint:
+            detail += f"（参考：{hint}）"
+        return f"HTTP {status}: {sanitize_text(detail, 300)}"
+
+    @staticmethod
+    def _finish_reason(payload: dict) -> str:
+        choices = payload.get("choices") or []
+        if choices and isinstance(choices[0], dict):
+            return str(choices[0].get("finish_reason") or "unknown")
+        return "unknown"
 
     @staticmethod
     def _content_of(payload: dict) -> str:

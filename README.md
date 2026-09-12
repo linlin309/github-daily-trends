@@ -70,6 +70,7 @@ templates/email.html.j2     # 邮件模板（表格布局 + 内联样式 + 自�
 tests/                      # 67 个测试 + 真实 Trending HTML fixture
 scripts/fetch_fixture.py    # 保存真实页面为 fixture
 scripts/check_trending.py   # 线上解析自检（canary）
+scripts/check_llm.py        # LLM 探针：几秒钟定位 429/超时/模型名/额度问题
 config.yaml                 # 规则 / 权重 / 配额 / 分类，全部可调，不含任何凭据
 reports/YYYY-MM-DD.md       # 人读历史
 reports/YYYY-MM-DD.json     # 机器读历史（未来趋势分析的接口）
@@ -126,7 +127,7 @@ python -m src.main --send-only --date 2026-09-12     # 只发邮件（读已落�
 | 名称 | 填什么 |
 |---|---|
 | `LLM_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4/`（国际站：`https://api.z.ai/api/paas/v4`） |
-| `LLM_MODEL` | `glm-4.7-flash`（**注意：`glm-4.7-flashx` 是收费的**） |
+| `LLM_MODEL` | `glm-4.7-flash`（**注意：`glm-4.7-flashx` 是收费的**；智谱官方未公布免费档的 RPM/TPM/并发数值，程序会把超限错误码原文打进日志） |
 | `LLM_FALLBACK_BASE_URL` | 可选，`https://openrouter.ai/api/v1` |
 | `LLM_FALLBACK_MODEL` | 可选，例如 `google/gemma-4-31b-it:free` |
 | `MAIL_SMTP_HOST` | `smtp.163.com` |
@@ -191,6 +192,10 @@ Actions → **daily-report** → **Run workflow**：
 | `filter.markup_ratio_max` | Markdown 等标记语言占比超过 60% → 判为文档/书籍类 |
 | `filter.positive_weights` | software_score 的正向信号权重 |
 | `scoring.weights` | 热度分权重（速度 0.40 / 规模 0.20 / 名次 0.15 / 首次上榜 0.15 / 来源 0.10） |
+| `llm.providers[].extra_body` | 厂商专属参数透传（默认给智谱传 `thinking: {type: disabled}`，见下节） |
+| `llm.timeout_seconds` | 读超时（默认 240s）。生成式模型很慢，**不要调小** |
+| `llm.max_output_tokens` | 输出上限（默认 1500）。生成时间 ≈ 输出 token 数，越小越快 |
+| `llm.retry_backoff_seconds` | 重试前退避（默认 15s）。免费档并发常常是 1，立刻重试会再撞限流 |
 | `selection.*_penalty` | 多样性软惩罚与"近期已报过"降权 |
 | `llm.providers` | 主/备 Provider（值来自环境变量） |
 
@@ -245,6 +250,39 @@ JSON 里已经为将来留好了接口：
 
 ---
 
+## 遇到「AI 分析失败」怎么排查
+
+**第一步永远是探针**（几秒钟，不跑采集、不发邮件）：
+
+```bash
+export LLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4/
+export LLM_MODEL=glm-4.7-flash
+export LLM_API_KEY=...
+python scripts/check_llm.py            # 最小请求：验证鉴权 / base_url / 模型名 / 账号额度
+python scripts/check_llm.py --full     # 真实提示词 + 真实项目：测真实耗时与 token
+```
+
+程序会把服务端返回的 `code` / `message` **原文**写进日志、运行摘要和报告里的降级提示（只说"HTTP 429"无法定位问题）。
+
+| 错误码 | 含义 | 处理 |
+|---|---|---|
+| 1302 / 1303 | 并发或频率超限（免费档并发常常是 1） | 程序已改为退避 15s 再试；频繁出现说明当时免费档拥挤，稍后重跑 |
+| 1305 | 服务过载 | 稍后重试（程序自动处理） |
+| 1308 / 1310 | 额度已用尽 | 该模型对当前账号可能并非免费；优先启用备用 Provider（OpenRouter）。注意 GLM-4.5-Flash 已进入下线流程，请求会被自动路由到 GLM-4.7-Flash |
+| 1113 | 账户余额不足 | 同上：说明这个模型在你的账号下是收费模型 |
+| 1200 / 1214 | 参数或模型名错误 | 用探针核对 `LLM_MODEL` |
+| 401 / 403 | Key 无效或未开通 | 重新生成 API Key |
+
+失败最常见的三个原因（按概率）：
+
+1. **读超时太小**。GLM-4.7 系列**默认「开启 Thinking」**，会先写一段推理再输出正文，30 秒根本不够。现在 `llm.timeout_seconds: 240` 并**真的传给了 HTTP 层**——早期版本这个配置是死代码，实际只有 30 秒，这正是日志里"30 秒 Read timed out"的原因。
+2. **默认开思考导致输出过长**。现在按官方文档（`capabilities/thinking-mode`）显式传 `thinking: {type: disabled}`，并把 `max_output_tokens` 从 3000 降到 1500、提示词字段上限收紧到 25–60 字。
+3. **重试太快撞上并发限制**。超时后立刻重试会撞 429；现在重试前退避 15 秒。
+
+另外：如果服务端不接受 `thinking` 这类厂商专属参数（返回 400/422），程序会**自动去掉该参数重试一次**，不会直接降级。想恢复"让模型先思考"：把 `config.yaml` 里 `llm.providers[0].extra_body` 清空，同时把 `timeout_seconds` 保持在 240 以上、`max_output_tokens` 提到 2000+。
+
+---
+
 ## 排错
 
 | 现象 | 原因 / 处理 |
@@ -255,7 +293,7 @@ JSON 里已经为将来留好了接口：
 | `553` | `MAIL_USERNAME` 与 From 不一致 |
 | `550` / `554` 且含 `DT:SPM` | 网易反垃圾拦截：检查主题与正文（程序已带纯文本+HTML 双版本） |
 | 连接超时（无报错） | 用了 25 端口。Actions 出站 25 被封锁，**必须 465 + SSL** |
-| 报告里出现"AI 分析不可用" | LLM 限流/超时且备用也失败 → 自动降级为纯数据日报（这是设计行为，邮件照发） |
+| 报告里出现"AI 分析不可用" | LLM 限流/超时且备用也失败 → 自动降级为纯数据日报（设计行为，邮件照发）。**先跑 `python scripts/check_llm.py`**，见上一节 |
 | 报告里出现"降级模式" | Trending 抓取失败 → 走了 Search 兜底，来源权重较低，属预期降级 |
 | `parser-canary` 变红 | Trending 页面结构改了：`python scripts/fetch_fixture.py` 存新样本 → 更新 `src/trending.py` 选择器与 fixture |
 
@@ -271,6 +309,7 @@ JSON 里已经为将来留好了接口：
 6. **首次运行没有历史**："连续上榜/首次上榜"从第二天起才准确。
 7. **AI 的"为什么值得关注"在缺少硬数据时只是推测**，会带"（推测）"标记；没有硬数据支撑的"某公司采用"之类断言被提示词明令禁止，并在校验层强制标记。
 8. **没有星级评分**：排序是程序算的热度分，AI 不打分（避免"全是 5 星"的无信息量评级）。
+9. **智谱 GLM-4.7 系列默认开启 Thinking**，本项目按官方文档显式关闭（`llm.providers[0].extra_body`）以保证速度与 token 消耗；若你想恢复思考，请把 `timeout_seconds` 保持 240s 以上、`max_output_tokens` 提到 2000+。
 9. 邮件模板未做深色模式适配；正文宽度按 640px 优化。
 10. `preview/` 目录是本地预览产物，已在 `.gitignore` 中，不参与提交。
 

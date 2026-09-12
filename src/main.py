@@ -100,6 +100,7 @@ def run(args: argparse.Namespace) -> int:
 
     def fail(subject: str, body: str, exit_code: int = 1) -> int:
         LOG.error(body)
+        _gh_annotation("error", body, subject)
         if not args.dry_run and not args.no_email:
             _send_alert(cfg, subject, body)
         _write_step_summary(f"## ❌ {subject}\n\n{body}\n")
@@ -293,6 +294,7 @@ def run(args: argparse.Namespace) -> int:
     if not analysis.ok:
         degraded.append(f"AI 分析不可用（{analysis.degraded_reason}），本次为纯数据日报")
         LOG.warning("AI 分析失败：%s", analysis.degraded_reason)
+        _gh_annotation("warning", f"AI 分析不可用：{analysis.degraded_reason}", "LLM 降级")
     else:
         LOG.info("AI 分析完成：provider=%s model=%s calls=%d", analysis.provider, analysis.model, analysis.calls)
     if analyzer.calls > int(cfg["llm"].get("max_calls_total", 2)):
@@ -347,6 +349,9 @@ def run(args: argparse.Namespace) -> int:
         LOG.info("--no-email：跳过邮件发送")
     else:
         LOG.info("报告 %s 已存在，跳过重复发送邮件（如需重发请使用 --force）", date_str)
+
+    if degraded:
+        _gh_annotation("warning", "；".join(degraded), "本次运行有降级")
 
     _write_step_summary(
         _summary_markdown(date_str, outcome, analysis, mode, degraded, written, email_result)
@@ -468,6 +473,15 @@ def _write_step_summary(markdown: str) -> None:
             handle.write(markdown + "\n")
     except OSError as exc:
         LOG.warning("写入 GITHUB_STEP_SUMMARY 失败: %s", exc)
+
+
+def _gh_annotation(level: str, message: str, title: str | None = None) -> None:
+    """在 GitHub Actions 界面上生成醒目的 warning/error 注解（本地运行无副作用）。"""
+    if os.environ.get("GITHUB_ACTIONS") != "true":
+        return
+    escaped = str(message).replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+    suffix = f" title={title}" if title else ""
+    print(f"::{level}{suffix}::{escaped}", flush=True)
 
 
 def _summary_markdown(date_str, outcome, analysis, mode, degraded, written, email_result) -> str:

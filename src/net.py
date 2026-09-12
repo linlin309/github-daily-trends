@@ -91,8 +91,10 @@ class HttpClient:
         require_https: bool = True,
         allow_status: tuple[int, ...] = (200,),
         max_sleep_seconds: float = 60.0,
+        timeout: tuple[float, float] | None = None,
     ) -> requests.Response:
         validate_public_url(url, require_https=require_https)
+        effective_timeout = timeout or self.timeout
         last_error: Exception | None = None
 
         for attempt in range(1, self.max_retries + 1):
@@ -103,7 +105,7 @@ class HttpClient:
                     headers=headers,
                     params=params,
                     json=json_body,
-                    timeout=self.timeout,
+                    timeout=effective_timeout,
                     allow_redirects=True,
                 )
             except requests.RequestException as exc:
