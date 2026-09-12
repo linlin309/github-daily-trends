@@ -3,7 +3,7 @@
 日期：2026-09-12
 仓库：`linlin309/github-daily-trends`（由 `linlin309/-` 改名）
 本文档取代 v1 评审稿（`GitHub每日软件趋势-实施方案评审.md`）中的方案部分；v1 中的事实核实与安全分析结论继续有效。
-状态：**方案定稿阶段，尚未开始实现**
+状态：**已实现并上线（本文件为定稿方案存档，实际取值以 `config.yaml` 为准）**
 
 ---
 
@@ -11,7 +11,7 @@
 
 | 决策 | 结论 |
 |---|---|
-| 邮箱 | **163 邮箱**，`smtp.163.com:465`（SSL），发件人 `linsoftware_aaa@163.com`，密码用 **SMTP 授权码**存 `MAIL_PASSWORD` |
+| 邮箱 | **163 邮箱**，`smtp.163.com:465`（SSL），发件人 `linxxx@163.com`，密码用 **SMTP 授权码**存 `MAIL_PASSWORD` |
 | AI | **智谱为主（`glm-4.7-flash`，免费）→ OpenRouter `:free` 为备**；统一 `LLM_BASE_URL` / `LLM_MODEL` / `LLM_API_KEY`，不锁厂商；**每天只做 1 次主调用** |
 | 仓库名 | 改为 **`github-daily-trends`**（同意改名，不再使用 `-`） |
 
@@ -342,10 +342,10 @@ mail:
   smtp_host: smtp.163.com
   smtp_port: 465
   use_ssl: true                 # 必须；Actions 出站 25 端口被封
-  username: ${MAIL_USERNAME}    # linsoftware_aaa@163.com
+  username: ${MAIL_USERNAME}    # linxxx@163.com
   password: ${MAIL_PASSWORD}    # 163 SMTP 授权码（不是登录密码）
   from_name: "GitHub 每日软件趋势"
-  to: [${MAIL_TO}]              # 可逗号分隔多个
+  to: ["${MAIL_TO}"]            # 占位符必须加引号（裸 ${} 会被 YAML 当成流式映射而解析失败）；可逗号分隔多个
   subject_prefix: "【GitHub 每日软件趋势】"
 ```
 
@@ -355,9 +355,9 @@ mail:
 2. 开启 **SMTP 服务**（网易通常要求**绑定手机号**才能开启客户端协议，按其提示完成验证）。
 3. 生成/新增**客户端授权码**，**立即复制**（只显示一次）。
 4. 到 GitHub 仓库 → Settings → Secrets and variables → Actions：
-   - Secret `MAIL_USERNAME` = `linsoftware_aaa@163.com`
+   - Secret `MAIL_USERNAME` = `linxxx@163.com`
    - Secret `MAIL_PASSWORD` = 刚才的授权码
-   - Variable `MAIL_TO` = `linsoftware_aaa@163.com`（若想发到别的收件箱就改这里）
+   - Variable `MAIL_TO` = `linxxx@163.com`（若想发到别的收件箱就改这里）
 
 ### 7.4 163 发信注意事项与排错表
 
@@ -531,9 +531,9 @@ README.md
 | `LLM_FALLBACK_API_KEY` | **Secret** | OpenRouter Key |
 | `LLM_FALLBACK_BASE_URL` | Variable | `https://openrouter.ai/api/v1` |
 | `LLM_FALLBACK_MODEL` | Variable | 例如 `google/gemma-4-31b-it:free`（免费名单会变，随时改这里） |
-| `MAIL_USERNAME` | **Secret** | `linsoftware_aaa@163.com` |
+| `MAIL_USERNAME` | **Secret** | `linxxx@163.com` |
 | `MAIL_PASSWORD` | **Secret** | 163 SMTP 授权码 |
-| `MAIL_TO` | Variable | `linsoftware_aaa@163.com` |
+| `MAIL_TO` | Variable | `linxxx@163.com` |
 | 其余（目标数量、惩罚权重、黑名单、分类映射、路径模板） | `config.yaml` | 可公开，无凭据 |
 
 安全约束（建议写成 CI 检查）：代码/配置/测试中**不得出现任何密钥字面量**；`config.yaml` 只允许 `${VAR}` 占位符；日志禁止打印请求头与完整 URL（如将来接把 key 放 query 的厂商，一律改用 `Authorization` 头）；外部请求仅允许 `https`，并拒绝 `localhost`/环回/私有地址。
@@ -645,6 +645,6 @@ Markdown 模板要点：
 
 1. **智谱 API Key**（`open.bigmodel.cn` 控制台创建），并确认你的账号是**国内站 bigmodel.cn** 还是**国际站 z.ai**（决定 `LLM_BASE_URL`；两者只是域名不同）。
 2. **163 授权码**（网页版邮箱开启 SMTP 后生成，一次性显示）。
-3. 确认 `MAIL_TO`：先用 `linsoftware_aaa@163.com` 自己发给自己，还是直接发到另一个常用邮箱（我更推荐后者，能显著降低被判垃圾的概率）。
+3. 确认 `MAIL_TO`：先用 `linxxx@163.com` 自己发给自己，还是直接发到另一个常用邮箱（我更推荐后者，能显著降低被判垃圾的概率）。
 
 拿到这三项后，按这个顺序实现：**① 骨架 + config → ② `trending.py` + fixture 单测 → ③ `github_api.py` → ④ `filtering.py`/`classify.py`/`select.py`（纯函数，最好测）→ ⑤ `analyze.py` + 提示词 → ⑥ `render.py`/`mailer.py`（dry-run 预览）→ ⑦ `main.py` + `history.py` → ⑧ workflow + canary → ⑨ 按 §16 验证。**

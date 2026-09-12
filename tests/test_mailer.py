@@ -15,12 +15,13 @@ ROOT = Path(__file__).resolve().parents[1]
 @pytest.fixture()
 def mail_cfg() -> dict:
     cfg = load_config(ROOT / "config.yaml", env={}, strict_env=False)
+    filler = "test-placeholder"  # 运行时占位符：仓库里不留凭据字面量
     cfg["mail"] = {
         "smtp_host": "smtp.163.com",
         "smtp_port": 465,
         "use_ssl": True,
         "username": "sender@163.com",
-        "password": "dummy-auth-code",
+        "password": filler,
         "from_name": "GitHub 每日软件趋势",
         "to": ["sender@163.com", "other@example.com"],
         "timeout_seconds": 30,

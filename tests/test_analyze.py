@@ -89,13 +89,14 @@ def make(full_name: str, **kwargs) -> Candidate:
 @pytest.fixture(scope="module")
 def llm_cfg() -> dict:
     cfg = load_config(ROOT / "config.yaml", env={}, strict_env=False)
+    filler = "test-placeholder"  # 运行时占位符：仓库里不留凭据字面量
     cfg["llm"]["providers"] = [
-        {"name": "primary", "base_url": "https://llm.invalid/v1", "model": "m1", "api_key": "dummy-key-1"},
+        {"name": "primary", "base_url": "https://llm.invalid/v1", "model": "m1", "api_key": filler},
         {
             "name": "fallback",
             "base_url": "https://llm2.invalid/v1",
             "model": "m2",
-            "api_key": "dummy-key-2",
+            "api_key": filler,
         },
     ]
     return cfg["llm"]

@@ -11,6 +11,26 @@ from src.config import ConfigError, load_config
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _env(**overrides: str) -> dict[str, str]:
+    """构造一份可用的假环境。
+
+    凭据值由局部变量派生，仓库里不出现任何"像凭据"的字面量。
+    """
+    filler = "test-placeholder"
+    env = {
+        "LLM_BASE_URL": "https://example.invalid/api/paas/v4/",
+        "LLM_MODEL": "glm-4.7-flash",
+        "LLM_API_KEY": filler,
+        "MAIL_SMTP_HOST": "smtp.163.com",
+        "MAIL_SMTP_PORT": "465",
+        "MAIL_USERNAME": "sender@163.com",
+        "MAIL_PASSWORD": filler,
+        "MAIL_TO": "sender@163.com",
+    }
+    env.update(overrides)
+    return env
+
+
 def test_nested_int_coercion_keeps_structure():
     """回归测试：三级路径的 int 转换绝不能把中间的 dict 覆盖成 int。"""
     cfg = load_config(ROOT / "config.yaml", env={}, strict_env=False)
@@ -30,17 +50,7 @@ def test_missing_required_env_fails_fast():
 
 
 def test_env_placeholders_resolved():
-    env = {
-        "LLM_BASE_URL": "https://example.invalid/api/paas/v4/",
-        "LLM_MODEL": "glm-4.7-flash",
-        "LLM_API_KEY": "dummy-llm-key",
-        "MAIL_SMTP_HOST": "smtp.163.com",
-        "MAIL_SMTP_PORT": "465",
-        "MAIL_USERNAME": "sender@163.com",
-        "MAIL_PASSWORD": "dummy-auth-code",
-        "MAIL_TO": "sender@163.com",
-    }
-    cfg = load_config(ROOT / "config.yaml", env=env, strict_env=True)
+    cfg = load_config(ROOT / "config.yaml", env=_env(), strict_env=True)
     assert cfg["mail"]["smtp_host"] == "smtp.163.com"
     assert cfg["mail"]["smtp_port"] == 465
     assert cfg["mail"]["to"] == ["sender@163.com"]
@@ -50,19 +60,12 @@ def test_env_placeholders_resolved():
 
 
 def test_fallback_provider_kept_when_configured():
-    env = {
-        "LLM_BASE_URL": "https://example.invalid/api/paas/v4/",
-        "LLM_MODEL": "glm-4.7-flash",
-        "LLM_API_KEY": "dummy-llm-key",
-        "LLM_FALLBACK_BASE_URL": "https://openrouter.invalid/api/v1",
-        "LLM_FALLBACK_MODEL": "some/model:free",
-        "LLM_FALLBACK_API_KEY": "dummy-openrouter-key",
-        "MAIL_SMTP_HOST": "smtp.163.com",
-        "MAIL_SMTP_PORT": "465",
-        "MAIL_USERNAME": "sender@163.com",
-        "MAIL_PASSWORD": "dummy-auth-code",
-        "MAIL_TO": "sender@163.com,other@example.com",
-    }
+    env = _env(
+        LLM_FALLBACK_BASE_URL="https://openrouter.invalid/api/v1",
+        LLM_FALLBACK_MODEL="some/model:free",
+        MAIL_TO="sender@163.com,other@example.com",
+    )
+    env["LLM_FALLBACK_API_KEY"] = env["LLM_API_KEY"]
     cfg = load_config(ROOT / "config.yaml", env=env, strict_env=True)
     names = [p["name"] for p in cfg["llm"]["providers"]]
     assert names == ["zhipu", "openrouter"]
@@ -71,16 +74,7 @@ def test_fallback_provider_kept_when_configured():
 
 def test_same_vendor_alt_model_provider_is_optional():
     """LLM_MODEL_2 复用主 Key：配了就有同厂商兜底，没配就自动忽略。"""
-    base_env = {
-        "LLM_BASE_URL": "https://open.bigmodel.cn/api/paas/v4/",
-        "LLM_MODEL": "glm-4.7-flash",
-        "LLM_API_KEY": "dummy-llm-key",
-        "MAIL_SMTP_HOST": "smtp.163.com",
-        "MAIL_SMTP_PORT": "465",
-        "MAIL_USERNAME": "sender@163.com",
-        "MAIL_PASSWORD": "dummy-auth-code",
-        "MAIL_TO": "sender@163.com",
-    }
+    base_env = _env(LLM_BASE_URL="https://open.bigmodel.cn/api/paas/v4/")
     without = load_config(ROOT / "config.yaml", env=base_env, strict_env=True)
     assert [p["name"] for p in without["llm"]["providers"]] == ["zhipu"]
 
@@ -100,7 +94,12 @@ def test_credentials_never_literal_in_repo_files():
     import re
 
     suspicious = re.compile(r"(sk-[A-Za-z0-9]{16,}|Bearer\s+[A-Za-z0-9._-]{20,})")
-    for path in list(ROOT.glob("*.yaml")) + list(ROOT.glob("src/*.py")):
+    for path in (
+        list(ROOT.glob("*.yaml"))
+        + list(ROOT.glob("src/*.py"))
+        + list(ROOT.glob("tests/*.py"))
+        + list(ROOT.glob("scripts/*.py"))
+    ):
         text = path.read_text(encoding="utf-8")
         assert not suspicious.search(text), f"{path} 中疑似出现真实凭据"
     config_text = (ROOT / "config.yaml").read_text(encoding="utf-8")
