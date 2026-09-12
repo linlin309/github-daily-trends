@@ -1,0 +1,14 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# ---- 本地预览产物（dry-run 输出，不提交）----
+preview/
+
+# ---- 工具 ----
+.pytest_cache/
+.mimosa/
+.playwright-mcp/

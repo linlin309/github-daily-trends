@@ -1,0 +1,122 @@
+name: daily-report
+
+# 每天 12:00（Asia/Shanghai）自动运行；也支持手动触发（补跑 / 重发 / dry-run）
+on:
+  schedule:
+    - cron: '0 12 * * *'
+      timezone: 'Asia/Shanghai'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: '报告日期 YYYY-MM-DD（留空 = 按 Asia/Shanghai 当天）'
+        required: false
+        type: string
+      force:
+        description: '强制重发邮件（当天已发送过时使用）'
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: '只生成到 preview/ 并打印预览（不发邮件、不提交）'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write          # 仅为提交 reports/，最小权限
+
+concurrency:
+  group: daily-report
+  cancel-in-progress: false  # 两次运行串行，避免交叉写文件
+
+jobs:
+  # 先跑单元测试：解析器或规则改坏了就不生成日报
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest tests -q
+
+  report:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
+      LLM_FALLBACK_API_KEY: ${{ secrets.LLM_FALLBACK_API_KEY }}
+      LLM_FALLBACK_BASE_URL: ${{ vars.LLM_FALLBACK_BASE_URL }}
+      LLM_FALLBACK_MODEL: ${{ vars.LLM_FALLBACK_MODEL }}
+      MAIL_SMTP_HOST: ${{ vars.MAIL_SMTP_HOST }}
+      MAIL_SMTP_PORT: ${{ vars.MAIL_SMTP_PORT }}
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      MAIL_TO: ${{ vars.MAIL_TO }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: 计算报告日期（Asia/Shanghai）
+        id: meta
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.date }}" ]; then
+            echo "date=${{ inputs.date }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "date=$(TZ=Asia/Shanghai date +%F)" >> "$GITHUB_OUTPUT"
+          fi
+          echo "报告日期：$(cat "$GITHUB_OUTPUT" | tail -1)"
+
+      - name: 幂等检查（当天是否已有报告）
+        id: idem
+        run: |
+          set -euo pipefail
+          if [ -f "reports/${{ steps.meta.outputs.date }}.md" ]; then
+            echo "exists=1" >> "$GITHUB_OUTPUT"
+            echo "当天报告已存在：跳过后面的邮件发送（除非 force=true）"
+          else
+            echo "exists=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 生成报告（先落盘，不发邮件）
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python -m src.main --date "${{ steps.meta.outputs.date }}" --dry-run
+          else
+            python -m src.main --date "${{ steps.meta.outputs.date }}" --no-email
+          fi
+
+      - name: 提交历史（MD + JSON）
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports
+          if git diff --cached --quiet; then
+            echo "没有文件变更，跳过提交"
+            exit 0
+          fi
+          git commit -m "report: ${{ steps.meta.outputs.date }}"
+          if ! git push; then
+            echo "push 失败，尝试 rebase 后重试一次"
+            git pull --rebase --autostash
+            git push
+          fi
+
+      - name: 发送邮件（历史已提交之后才执行）
+        if: ${{ inputs.dry_run != true && (steps.idem.outputs.exists == '0' || inputs.force == true) }}
+        run: python -m src.main --send-only --date "${{ steps.meta.outputs.date }}"

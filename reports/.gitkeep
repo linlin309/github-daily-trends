@@ -1,0 +1,2 @@
+# 该文件用于让 reports/ 目录始终存在于仓库中，
+# 这样 Actions 里的 `git add reports` 在第一次运行前也不会因为目录不存在而失败。

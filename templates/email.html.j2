@@ -1,0 +1,145 @@
+{# 邮件模板：表格布局 + 内联样式，兼容邮件客户端；所有动态文本由 Jinja2 自动转义。 #}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{{ title_prefix }}{{ date }}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f5f7;-webkit-text-size-adjust:100%;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f5f7;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:640px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',Roboto,Helvetica,Arial,sans-serif;">
+
+          <!-- 头部 -->
+          <tr>
+            <td style="background-color:#111827;border-radius:14px 14px 0 0;padding:22px 24px;">
+              <div style="font-size:13px;color:#9ca3af;letter-spacing:.6px;">{{ date }}</div>
+              <div style="font-size:22px;line-height:1.3;font-weight:700;color:#ffffff;margin-top:6px;">GitHub 每日软件趋势</div>
+              <div style="font-size:14px;line-height:1.6;color:#d1d5db;margin-top:8px;">
+                今日精选 <strong style="color:#ffffff;">{{ selected_count }}</strong> 个软件项目
+                &nbsp;·&nbsp; 候选池 {{ candidates_count }} 个
+                &nbsp;·&nbsp; {{ mode_label }}
+              </div>
+            </td>
+          </tr>
+
+          <!-- 概览 -->
+          <tr>
+            <td style="background-color:#ffffff;padding:22px 24px 6px 24px;">
+              <div style="font-size:15px;font-weight:700;color:#111827;padding-bottom:10px;">今日趋势概览</div>
+              <div style="font-size:15px;line-height:1.7;color:#1f2937;">{{ summary.get('headline') or '（AI 未生成概览）' }}</div>
+              {% if summary.get('trends') %}
+              <ul style="margin:12px 0 0 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
+                {% for item in summary.get('trends') %}<li>{{ item }}</li>{% endfor %}
+              </ul>
+              {% endif %}
+              {% if summary.get('highlights') %}
+              <ul style="margin:8px 0 0 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
+                {% for item in summary.get('highlights') %}<li>{{ item }}</li>{% endfor %}
+              </ul>
+              {% endif %}
+              {% if shortage_note %}
+              <div style="margin-top:14px;padding:10px 12px;background-color:#fffbeb;border-left:3px solid #f59e0b;border-radius:4px;font-size:13px;line-height:1.7;color:#92400e;">
+                {{ shortage_note }}
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+
+          {% if tag_rows %}
+          <tr>
+            <td style="background-color:#ffffff;padding:14px 24px 18px 24px;">
+              {% for tag, names in tag_rows %}
+              <div style="margin-top:8px;font-size:13px;line-height:1.7;color:#374151;">
+                <span style="display:inline-block;background-color:#eef2ff;color:#3730a3;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;">{{ tag_emoji.get(tag, '') }} {{ tag }}</span>
+                <span style="margin-left:6px;">{{ names|join('、') }}</span>
+              </div>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endif %}
+
+          <!-- 项目列表 -->
+          {% for c in selected %}
+          <tr>
+            <td style="background-color:#ffffff;padding:0 24px;">
+              <div style="height:1px;background-color:#e5e7eb;"></div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#ffffff;padding:20px 24px 4px 24px;">
+              <div style="font-size:17px;line-height:1.4;font-weight:700;color:#111827;">
+                <span style="display:inline-block;min-width:26px;color:#9ca3af;font-variant-numeric:tabular-nums;">{{ '%02d'|format(c.rank) }}</span>
+                <a href="{{ c.url }}" style="color:#1d4ed8;text-decoration:none;">{{ c.full_name }}</a>
+              </div>
+              {% if c.tags %}
+              <div style="margin-top:8px;">
+                {% for tag in c.tags %}<span style="display:inline-block;background-color:#fef3c7;color:#92400e;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;margin-right:6px;">{{ tag_emoji.get(tag, '') }} {{ tag }}</span>{% endfor %}
+              </div>
+              {% endif %}
+              <div style="margin-top:10px;padding:10px 12px;background-color:#f9fafb;border-radius:6px;font-size:13px;line-height:1.8;color:#374151;">
+                <span style="color:#6b7280;">Stars</span> <strong style="color:#111827;">{{ fmt_int(c.stars) }}</strong>
+                <span style="color:#059669;">（今日 {{ fmt_signed(c.stars_today) }}）</span>
+                &nbsp;·&nbsp; <span style="color:#6b7280;">Forks</span> {{ fmt_int(c.forks) }}
+                &nbsp;·&nbsp; <span style="color:#6b7280;">语言</span> {{ c.language or '—' }}
+                {% if c.trending_streak_days > 1 %}&nbsp;·&nbsp; <span style="color:#6b7280;">连续上榜</span> {{ c.trending_streak_days }} 天{% endif %}
+                <br>
+                <span style="color:#6b7280;">Topics</span> {{ c.topics[:8]|join(', ') or '—' }}
+                &nbsp;·&nbsp; <span style="color:#6b7280;">更新</span> {{ short_date(c.pushed_at) }}
+                &nbsp;·&nbsp; <span style="color:#6b7280;">热度分</span> {{ '%.1f'|format(c.trend_score) }}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#ffffff;padding:12px 24px 20px 24px;font-size:14px;line-height:1.75;color:#1f2937;">
+              {% if c.ai.get('summary') %}<div style="font-weight:700;color:#111827;margin-bottom:6px;">{{ c.ai.get('summary') }}</div>{% endif %}
+              {% if c.ai.get('what_it_is') %}<div style="margin-bottom:5px;"><span style="color:#6b7280;">它是什么：</span>{{ c.ai.get('what_it_is') }}</div>{% endif %}
+              {% if c.ai.get('why_worth_attention') %}
+              <div style="margin-bottom:5px;"><span style="color:#6b7280;">为什么值得关注{% if c.ai.get('why_is_speculation') %}（推测）{% endif %}：</span>{{ c.ai.get('why_worth_attention') }}</div>
+              {% endif %}
+              {% if c.ai.get('use_case') %}<div style="margin-bottom:5px;"><span style="color:#6b7280;">典型场景：</span>{{ c.ai.get('use_case') }}</div>{% endif %}
+              {% if c.ai.get('target_user') %}<div><span style="color:#6b7280;">适合谁：</span>{{ c.ai.get('target_user') }}</div>{% endif %}
+              {% if c.ai.get('unavailable') %}<div style="color:#9ca3af;font-size:13px;">（AI 分析不可用，本条为纯数据展示）</div>{% endif %}
+              <div style="margin-top:12px;">
+                <a href="{{ c.url }}" style="display:inline-block;background-color:#1d4ed8;color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;padding:8px 14px;border-radius:6px;">在 GitHub 打开</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+
+          <!-- 运行提示 -->
+          {% if degraded %}
+          <tr>
+            <td style="background-color:#ffffff;padding:0 24px;">
+              <div style="height:1px;background-color:#e5e7eb;"></div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#ffffff;padding:16px 24px;font-size:12px;line-height:1.8;color:#6b7280;">
+              <div style="font-weight:700;color:#374151;margin-bottom:4px;">本次运行提示</div>
+              {% for item in degraded %}<div>· {{ item }}</div>{% endfor %}
+            </td>
+          </tr>
+          {% endif %}
+
+          <!-- 尾部 -->
+          <tr>
+            <td style="background-color:#ffffff;border-radius:0 0 14px 14px;padding:18px 24px 22px 24px;">
+              <div style="font-size:12px;line-height:1.8;color:#9ca3af;">
+                生成时间 {{ generated_at }}（Asia/Shanghai）
+                {% if llm.get('provider') %}· 分析模型 {{ llm.get('provider') }}/{{ llm.get('model') }}{% endif %}
+                {% if llm.get('calls') %}· 调用 {{ llm.get('calls') }} 次{% endif %}
+                <br>
+                Generated automatically by GitHub Actions
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

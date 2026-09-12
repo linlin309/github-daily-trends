@@ -1,0 +1,310 @@
+# ============================================================================
+# GitHub 每日软件趋势 — 运行配置
+# 说明：本文件可以公开，不含任何凭据。凭据一律写成 ${VAR} 占位符，
+#       由 src/config.py 在运行时从环境变量读取；缺失即报错退出（fail fast）。
+# ============================================================================
+
+timezone: Asia/Shanghai
+
+report:
+  target_count: 10              # 最终数量上限（≤10，不是必须 10）
+  hard_floor: 35.0              # 质量下限：调整后分数低于此值不再入选
+  title_prefix: "【GitHub 每日软件趋势】"
+  max_description_chars: 300     # 交给 LLM 的描述截断长度
+
+paths:
+  reports_dir: reports
+  markdown_name: "{date}.md"
+  json_name: "{date}.json"
+
+http:
+  user_agent: "github-daily-trends/1.0 (+https://github.com/linlin309/github-daily-trends)"
+  timeout_connect: 10
+  timeout_read: 30
+  max_retries: 3
+  backoff_seconds: 2
+
+# ---------------------------------------------------------------------------
+# GitHub API：认证用 Actions 自动注入的 GITHUB_TOKEN（1000 请求/小时/仓库）
+# ---------------------------------------------------------------------------
+github:
+  api_base: "https://api.github.com"
+  api_version: "2022-11-28"
+  max_enrich_repos: 150         # 补全数量上限（122 候选 × 约 4 次调用 ≈ 490 次，低于 1000/小时）
+  max_unauth_enrich: 20         # 无 token 时的上限（未认证限额仅 60/小时；此模式下自动跳过 contents/releases 调用）
+  min_rate_remaining: 30        # 剩余额度低于此值停止补全，改用已采集数据
+  skip_manifests_when_low: true # 额度紧张时跳过 /contents 调用
+
+# ---------------------------------------------------------------------------
+# 候选池来源：发现（daily）/ 补温（weekly、语言页）/ 兜底（Search API）
+# ---------------------------------------------------------------------------
+sources:
+  daily_url: "https://github.com/trending?since=daily"
+  weekly_url: "https://github.com/trending?since=weekly"
+  language_url_template: "https://github.com/trending/{language}?since=daily"
+  languages: [python, typescript, javascript, go, rust, java]
+  spoken_language_url: ""        # 可选，例如 https://github.com/trending?since=daily&spoken_language_code=zh
+  weights:
+    daily: 1.0
+    language: 0.85
+    weekly: 0.7
+    spoken: 0.6
+    search: 0.5
+  search:
+    enabled: true
+    trigger_min_candidates: 40   # 去重后候选数少于此值 → 触发
+    trigger_min_kept: 5          # 过滤后合格项目少于此值 → 触发
+    max_queries_per_run: 2       # 每天最多 2 次，主动自我限制（限额是 30 次/分钟）
+    per_page: 30
+    min_new_stars: 100
+    min_active_stars: 2000
+    queries:
+      - name: search_new
+        q: "created:>{date_minus_7} stars:>{min_new_stars}"
+        sort: stars
+      - name: search_active
+        q: "pushed:>{date_minus_3} stars:>{min_active_stars}"
+        sort: stars
+
+# ---------------------------------------------------------------------------
+# 软件相关性过滤（规则优先，AI 不参与相关性判定）
+# ---------------------------------------------------------------------------
+filter:
+  archived_drop: true
+
+  # 强信号：命中任意一条即判定"非软件"，直接排除
+  strong:
+    name_regex:
+      - '(?i)^awesome$'
+      - '(?i)^awesome[-_].+'
+      - '(?i).+[-_]awesome$'
+      - '(?i)cheat[-_]?sheet'
+      - '(?i)(^|[-_])(tutorial|tutorials)($|[-_])'
+      - '(?i)(^|[-_])(interview|interviews|interview-questions)($|[-_])'
+      - '(?i)(^|[-_])roadmap($|[-_])'
+      - '(?i)(^|[-_])(book|books|ebook|ebooks)($|[-_])'
+      - '(?i)(^|[-_])(paper|papers)($|[-_])'
+      - '(?i)(^|[-_])(dataset|datasets)($|[-_])'
+      - '(?i)(^|[-_])wallpapers?($|[-_])'
+      - '(?i)(^|[-_])(course|courses)($|[-_])'
+      - '(?i)^(free|best|top)[-_](programming|books|resources)'
+    topics:
+      - awesome-list
+      - awesome
+      - tutorial
+      - tutorials
+      - course
+      - courses
+      - book
+      - books
+      - interview
+      - interview-questions
+      - cheatsheet
+      - cheat-sheet
+      - roadmap
+      - learning-resources
+      - dataset
+      - datasets
+      - paper
+      - papers
+      - documentation
+      - docs
+      - blog
+      - resources
+      - examples
+      - wallpaper
+      - dotfiles
+    desc_regex:
+      - '(?i)^\s*(a\s+|the\s+)?(curated\s+)?(list|collection)\s+of\b'
+      - '(?i)\bawesome\s+(list|collection|repo)\b'
+      - '(?i)\bcollection of (books|links|resources|tutorials|articles|papers|tools)\b'
+      - '学习资料|学习资源|学习路线|教程合集|面试题|面试资料|资源合集|资源集合|电子书|读书笔记|笔记合集|由浅入深'
+
+  # 弱信号：单个不足以排除，需 ≥2 个同时命中
+  # 提示：想更激进地排除"技能/提示词集合"类仓库，把 skill(s)/prompt(s) 加进 strong 段即可。
+  weak:
+    name_words: [book, books, notes, note, list, lists, docs, doc, guide, guides, reference, examples, sample, samples, template, templates, boilerplate, starter, collection, resource, resources, learn, learning, study, awesome, handbook, manual, skill, skills]
+    desc_words: [book, books, notes, list of, lists of, guide, guides, tutorial, tutorials, learning, study, roadmap, awesome, resources, examples, collection, handbook, cheatsheet, skill, skills, prompt, prompts]
+    topics: [learning, study, guide, guides, handbook, reference, manual, template, boilerplate, starter, collection, list, curated, notes, resources, skills, claude-skills, claude-code-plugin, claude-plugin, agent-skills, ai-skills, prompts, prompt-engineering, cursor-rules]
+    min_hits: 2
+
+  # 代码占比（来自 /languages 的字节数）
+  markup_languages: [Markdown, TeX, Rich Text Format, Text, Roff, AsciiDoc, reStructuredText, JSON]
+  markup_ratio_max: 0.60          # Markdown 等标记语言占比超过 → 判为文档/书籍类
+  notebook_language: Jupyter Notebook
+  notebook_ratio_gray: 0.70       # 笔记本占比高且无依赖清单 → 灰区
+  html_language: HTML
+  html_ratio_gray: 0.80           # 静态页占比高且无清单无 release → 灰区
+
+  # 正向信号（构成 software_score，权重合计 1.0）
+  positive_weights:
+    manifest: 0.30                # 根目录存在依赖/构建清单
+    release: 0.15                 # 有 Release
+    topics: 0.25                  # topics 命中软件向白名单
+    code_language: 0.15           # 主语言是人类写的代码语言
+    license: 0.10                 # 有 License 且未归档
+    active: 0.05                  # 近 30 天有 push
+  weak_signal_penalty: 0.10
+  gray_penalty: 0.15
+  thresholds:
+    keep: 0.45                    # ≥ keep → 保留
+    gray: 0.30                    # gray ~ keep → 灰区（保留但降权）
+                                  # < gray → 排除
+
+  manifests: [package.json, pyproject.toml, setup.py, setup.cfg, requirements.txt, Cargo.toml, go.mod, pom.xml, build.gradle, build.gradle.kts, CMakeLists.txt, Makefile, composer.json, Gemfile, Podfile, Package.swift, Dockerfile, deno.json, mix.exs, build.sbt]
+  software_topics: [cli, command-line, tool, tools, framework, library, libraries, sdk, api, api-client, server, client, database, db, sql, nosql, devops, kubernetes, k8s, docker, container, infrastructure, security, vulnerability, scanner, pentest, agent, agents, llm, ai, ml, machine-learning, terminal, shell, automation, productivity, editor, ide, compiler, interpreter, runtime, browser, mobile, ios, android, desktop, electron, tauri, gui, monitoring, observability, proxy, gateway, queue, cache, testing, linter, formatter, static-analysis, reverse-engineering, cli-tool]
+
+# ---------------------------------------------------------------------------
+# 两级分类：group 用于多样性主惩罚，category 用于次惩罚与报告展示
+# ---------------------------------------------------------------------------
+classify:
+  fallback_category: other
+  fallback_group: other
+  categories:
+    - name: ai-agent
+      group: ai
+      topics: [ai-agent, agent, agents, agentic, autonomous-agents, multi-agent, llm-agent, agent-framework, mcp, mcp-server, tool-use]
+      keywords: [agent, agents, agentic, multi-agent, autonomous agent, mcp]
+    - name: ai-coding
+      group: ai
+      topics: [ai-coding, coding-agent, code-generation, copilot, code-assistant, vibe-coding, ai-programming]
+      keywords: [coding agent, code generation, copilot, code assistant, vibe coding, pair programmer]
+    - name: llm-infra
+      group: ai
+      topics: [llm, llm-inference, inference, rag, vector-database, embeddings, fine-tuning, transformer, model-serving, quantization, gpu]
+      keywords: [llm, inference engine, rag, embedding, fine-tune, model serving, quantization, tokenizer]
+    - name: ai-app
+      group: ai
+      topics: [ai, artificial-intelligence, generative-ai, text-to-image, text-to-speech, speech-recognition, ocr, ai-tools]
+      keywords: [artificial intelligence, generative ai, text to image, text to speech, speech recognition, ocr, ai tool]
+    - name: cli
+      group: dev-tools
+      topics: [cli, command-line, command-line-tool, terminal, shell, tui, cli-app, console]
+      keywords: [command line, cli, terminal, tui, shell tool]
+    - name: devtool
+      group: dev-tools
+      topics: [developer-tools, devtools, tooling, linter, formatter, static-analysis, testing, test, debugger, code-review, ide, editor, vscode-extension, neovim, plugin]
+      keywords: [developer tool, linter, formatter, static analysis, debugger, code review, plugin, extension]
+    - name: framework
+      group: dev-tools
+      topics: [framework, web-framework, backend-framework, frontend-framework, fullstack, orm, router, middleware, state-management]
+      keywords: [framework, boilerplate-free, orm, middleware, fullstack]
+    - name: library-sdk
+      group: dev-tools
+      topics: [library, libraries, sdk, api-client, package, module, bindings, wrapper, client-library]
+      keywords: [library, sdk, client library, bindings, wrapper, package for]
+    - name: database
+      group: data
+      topics: [database, db, sql, nosql, postgres, postgresql, mysql, sqlite, mongodb, redis, clickhouse, duckdb, storage-engine, query-engine, data-engineering, etl, kafka, stream-processing]
+      keywords: [database, sql, query engine, storage engine, data pipeline, etl, stream processing]
+    - name: devops-cloud
+      group: infrastructure
+      topics: [devops, kubernetes, k8s, docker, container, infrastructure, infrastructure-as-code, terraform, ansible, ci, cd, ci-cd, deployment, observability, monitoring, logging, prometheus, grafana, proxy, gateway, service-mesh, serverless, cloud]
+      keywords: [kubernetes, terraform, infrastructure as code, deployment, observability, monitoring, gateway, service mesh, serverless]
+    - name: security
+      group: security
+      topics: [security, cybersecurity, infosec, penetration-testing, pentest, vulnerability, vulnerability-scanner, exploit, malware-analysis, reverse-engineering, cryptography, encryption, authentication, authorization, zero-trust, threat-intelligence]
+      keywords: [security, vulnerability, penetration test, exploit, malware, reverse engineering, encryption, authentication, threat]
+    - name: web-frontend
+      group: web
+      topics: [frontend, web, react, vue, svelte, angular, css, ui, ui-components, component-library, design-system, tailwind, nextjs, static-site-generator, browser-extension]
+      keywords: [frontend, component library, design system, static site, browser extension, user interface]
+    - name: mobile-desktop
+      group: mobile-desktop
+      topics: [android, ios, mobile, mobile-app, flutter, react-native, desktop, desktop-app, electron, tauri, qt, gtk, cross-platform]
+      keywords: [android, ios, mobile app, desktop app, cross platform]
+    - name: systems-lang
+      group: systems
+      topics: [operating-system, kernel, compiler, interpreter, runtime, language, programming-language, virtual-machine, wasm, webassembly, embedded, firmware, filesystem, networking, protocol, emulator]
+      keywords: [operating system, kernel, compiler, interpreter, runtime, programming language, webassembly, emulator, filesystem]
+  language_fallback:
+    Python: library-sdk
+    TypeScript: library-sdk
+    JavaScript: library-sdk
+    Go: devtool
+    Rust: devtool
+    Java: library-sdk
+    "C++": systems-lang
+    C: systems-lang
+    "C#": library-sdk
+    Ruby: library-sdk
+    PHP: web-frontend
+    Swift: mobile-desktop
+    Kotlin: mobile-desktop
+    Dart: mobile-desktop
+    Shell: devtool
+    "Jupyter Notebook": llm-infra
+
+# ---------------------------------------------------------------------------
+# Trend Score：全部使用固定参考值归一化（不用"当天最大值"，保证跨天可比）
+# ---------------------------------------------------------------------------
+scoring:
+  weights_version: "2026-09-12"   # 公式版本，写进 JSON，便于将来对比不同权重下的历史分数
+  weights:
+    velocity: 0.40                # 当日 Stars 增长
+    scale: 0.20                   # 项目自身规模
+    rank: 0.15                    # Trending 名次
+    freshness: 0.15               # 是否首次上榜
+    source: 0.10                  # 来源权重
+  velocity_cap: 3000              # 当日增长饱和参考值
+  scale_cap: 200000               # 规模饱和参考值
+  rank_ref: 25                    # 名次参考（第 1 名 1.0，第 25 名 0.04）
+  missing_velocity_norm: 0.35     # 无当日增长数据时的中性值
+  missing_rank_norm: 0.5          # 无排名（Search 来源）时的中性值
+  freshness:
+    first_seen: 1.0
+    seen_2_3_days: 0.6
+    seen_4_plus_days: 0.4
+  min_velocity_for_source: null   # 预留
+
+# ---------------------------------------------------------------------------
+# 多样性选择：热度优先 + 两级软惩罚 + 质量下限
+# ---------------------------------------------------------------------------
+selection:
+  group_penalty: 14.0             # 粗类惩罚基数：第 3 个同类 ≈ -14，第 4 个 ≈ -33，第 5 个 ≈ -55
+  group_penalty_exponent: 1.25
+  category_penalty: 4.0           # 细类惩罚（从第 2 个完全相同类别开始）
+  language_penalty: 3.0           # 同语言惩罚（从第 3 个同语言开始）
+  repeat_penalty: 12.0            # 近 N 天已报告过 → 降权（提高日报新鲜度）
+  repeat_lookback_days: 3
+  unassessed_penalty: 10.0        # 未能通过 GitHub API 核实（限流/失败）→ 降权，避免挤掉已核实的软件
+  gray_penalty: 4.0               # software_score 落在灰区 → 轻微降权
+  hard_group_cap: null            # 预留：如需绝对上限可设数字
+
+# ---------------------------------------------------------------------------
+# LLM：OpenAI 兼容，不绑定任何厂商。凭据只从环境变量读取。
+# ---------------------------------------------------------------------------
+llm:
+  temperature: 0.3
+  max_output_tokens: 3000
+  timeout_seconds: 120
+  max_retries_per_provider: 2     # 每个 provider 最多尝试次数（第 2 次是 JSON 修复）
+  max_calls_total: 3              # 硬上限：1 次主调用 + 1 次 JSON 修复 + 1 次切换备用 Provider；正常情况只用 1 次
+  prompt_file: prompts/analyze.md
+  allowed_tags: [今日最值得关注, 今日最实用, 今日潜力项目]
+  max_field_chars: 80
+  max_one_liner_chars: 40
+  injection_markers: ["ignore previous instructions", "ignore all previous", "disregard previous", "system prompt", "you are now", "忽略以上指令", "忽略之前的指令", "忽略上述", "现在你是", "system:"]
+  providers:
+    - name: zhipu
+      base_url: ${LLM_BASE_URL}
+      model: ${LLM_MODEL}
+      api_key: ${LLM_API_KEY}
+    - name: openrouter
+      base_url: ${LLM_FALLBACK_BASE_URL}
+      model: ${LLM_FALLBACK_MODEL}
+      api_key: ${LLM_FALLBACK_API_KEY}
+
+# ---------------------------------------------------------------------------
+# 邮件：163 邮箱。用 465 + SSL（GitHub Actions 出站 25 端口被封）。
+# ---------------------------------------------------------------------------
+mail:
+  smtp_host: ${MAIL_SMTP_HOST}
+  smtp_port: ${MAIL_SMTP_PORT}
+  use_ssl: true
+  username: ${MAIL_USERNAME}
+  password: ${MAIL_PASSWORD}
+  from_name: "GitHub 每日软件趋势"
+  to: ["${MAIL_TO}"]           # 占位符必须加引号，否则 YAML 会把 {…} 当成映射
+  timeout_seconds: 30
+  max_retries: 2
