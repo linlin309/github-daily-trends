@@ -280,8 +280,9 @@ llm:
   connect_timeout_seconds: 15
   timeout_seconds: 240            # 读超时：生成式模型很慢，且空闲免费档可能几十秒才返回第一个 token
   retry_backoff_seconds: 15       # 重试前等待基数（免费档并发常常是 1，立刻重试会再次被限流）
+  overload_backoff_seconds: 30    # 遇到 1305（模型访问量过大）时的最短等待：官方建议就是"稍后再试"
   max_retries_per_provider: 2     # 每个 provider 最多尝试次数（第 2 次是 JSON 修复）
-  max_calls_total: 3              # 硬上限：1 次主调用 + 1 次 JSON 修复 + 1 次切换备用 Provider；正常情况只用 1 次
+  max_calls_total: 4              # 硬上限：正常只用 1 次；最坏 4 次（主模型 2 次含修复 + 同厂商备用 1 次 + 其他厂商备用 1 次）
   prompt_file: prompts/analyze.md
   allowed_tags: [今日最值得关注, 今日最实用, 今日潜力项目]
   max_field_chars: 60
@@ -298,6 +299,14 @@ llm:
       extra_body:
         thinking:
           type: disabled
+    # 同一厂商换模型的兜底：1305 是"该模型"当前访问量过大（按模型计），
+    # 换一个免费模型往往能绕开平台过载，而且复用主 Key，不需要额外 Secret。
+    # 未配置 LLM_MODEL_2 时该条会自动被忽略（只保留智谱主模型）。
+    - name: zhipu-alt-model
+      base_url: ${LLM_BASE_URL}
+      model: ${LLM_MODEL_2}          # 建议 glm-4-flash-250414（老一代免费模型，128K 上下文）
+      api_key: ${LLM_API_KEY}
+      # 老模型不是思考模型，不传 thinking 参数（万一服务端拒绝，程序也会自动去掉重试）
     - name: openrouter
       base_url: ${LLM_FALLBACK_BASE_URL}
       model: ${LLM_FALLBACK_MODEL}

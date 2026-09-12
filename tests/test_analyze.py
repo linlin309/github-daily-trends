@@ -158,19 +158,58 @@ def test_timeout_and_extra_body_are_actually_sent(fast_cfg):
 # ------------------------------------------------------------- 错误诊断
 def test_429_error_code_is_reported_with_hint(fast_cfg):
     http = FakeHttp(
-        [
-            (429, {"error": {"code": "1302", "message": "并发超限，请稍后重试"}}),
-            (429, {"error": {"code": "1302", "message": "并发超限，请稍后重试"}}),
-            (429, {"error": {"code": "1302", "message": "并发超限，请稍后重试"}}),
-        ]
+        [(429, {"error": {"code": "1302", "message": "您的账户已达到速率限制"}})] * 5
     )
     projects = [make("a/real")]
     result = LLMAnalyzer(fast_cfg, http, project_root=ROOT).analyze(projects, today=TODAY)
 
     assert result.ok is False
     assert "1302" in (result.degraded_reason or "")
-    assert "并发" in (result.degraded_reason or ""), "应带出服务端原文与参考含义"
+    assert "速率限制" in (result.degraded_reason or ""), "应带出官方错误原文与含义"
     assert result.calls <= fast_cfg["max_calls_total"]
+
+
+def test_empty_json_object_is_not_treated_as_success(fast_cfg):
+    """模型返回合法的 {} 属于"假成功"：必须判为无效，而不是产出空壳日报。"""
+    http = FakeHttp(["{}", "{}", "{}", "{}", "{}"])
+    projects = [make("a/real")]
+
+    result = LLMAnalyzer(fast_cfg, http, project_root=ROOT).analyze(projects, today=TODAY)
+
+    assert result.ok is False
+    assert "缺少必需字段" in (result.degraded_reason or "")
+    assert projects[0].ai.get("unavailable") is True
+
+
+def test_quota_exhausted_switches_provider_without_retry(fast_cfg):
+    """1308/1310/1113 是额度类错误，重试等不到重置 → 只打一次就换 Provider。"""
+    http = FakeHttp(
+        [
+            (429, {"error": {"code": "1308", "message": "已达到 100 次/天 的使用上限"}}),
+            json.dumps(good_payload(), ensure_ascii=False),
+        ]
+    )
+    projects = [make("a/real")]
+
+    result = LLMAnalyzer(fast_cfg, http, project_root=ROOT).analyze(projects, today=TODAY)
+
+    assert result.ok is True
+    assert result.provider == "fallback"
+    assert len(http.calls) == 2, "额度类错误不应在同一 Provider 上重试"
+    assert "1308" not in (result.degraded_reason or "")
+
+
+def test_overload_1305_waits_longer(fast_cfg, monkeypatch):
+    cfg = json.loads(json.dumps(fast_cfg))
+    cfg["retry_backoff_seconds"] = 5
+    cfg["overload_backoff_seconds"] = 45
+    slept: list[float] = []
+    monkeypatch.setattr("src.analyze.time.sleep", lambda seconds: slept.append(seconds))
+    http = FakeHttp([(429, {"error": {"code": "1305", "message": "该模型当前访问量过大"}})] * 3)
+
+    LLMAnalyzer(cfg, http, project_root=ROOT).analyze([make("a/real")], today=TODAY)
+
+    assert slept and slept[0] == 45, f"1305 过载应按 overload_backoff_seconds 等待，实际 {slept}"
 
 
 def test_fatal_401_is_not_retried(fast_cfg):
@@ -216,7 +255,8 @@ def test_retry_uses_configured_backoff(fast_cfg, monkeypatch):
     cfg["retry_backoff_seconds"] = 7
     slept: list[float] = []
     monkeypatch.setattr("src.analyze.time.sleep", lambda seconds: slept.append(seconds))
-    http = FakeHttp([(429, {"error": {"code": "1305", "message": "overloaded"}})] * 3)
+    # 1302（账户速率限制）走常规退避；1305 过载走更长的 overload_backoff，由另一个用例覆盖
+    http = FakeHttp([(429, {"error": {"code": "1302", "message": "您的账户已达到速率限制"}})] * 3)
 
     LLMAnalyzer(cfg, http, project_root=ROOT).analyze([make("a/real")], today=TODAY)
 

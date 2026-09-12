@@ -76,6 +76,7 @@ class LLMAnalyzer:
         self.connect_timeout = float(cfg.get("connect_timeout_seconds", 15))
         self.read_timeout = float(cfg.get("timeout_seconds", 240))
         self.retry_backoff = float(cfg.get("retry_backoff_seconds", 15))
+        self.overload_backoff = float(cfg.get("overload_backoff_seconds", 30))
         self.max_retries = int(cfg.get("max_retries_per_provider", 2))
         self.max_calls_total = int(cfg.get("max_calls_total", 2))
         self.allowed_tags = list(cfg.get("allowed_tags") or [])
@@ -139,17 +140,17 @@ class LLMAnalyzer:
     RETRYABLE_STATUS = (429, 500, 502, 503, 504)
     FATAL_STATUS = (400, 401, 403, 404, 422)
 
-    # 参考提示（非权威，以服务端返回的 message 为准），便于快速定位 429 的真正原因
+    # 参考提示（官方错误码表：docs.bigmodel.cn/cn/api/api-code，全部为 429）
     ERROR_HINTS = {
-        "1302": "并发或频率超限",
-        "1303": "并发超限",
-        "1304": "调用频率超限",
-        "1305": "服务过载，稍后重试即可",
-        "1308": "额度已用尽（该模型可能对当前账号不免费）",
-        "1310": "周期额度已用尽",
-        "1113": "账户余额不足（该模型可能并非免费模型）",
-        "1214": "模型不存在或未开通，请核对 LLM_MODEL",
+        "1113": "账户已欠费，请充值后重试",
+        "1302": "账户已达到速率限制（控制请求频率）",
+        "1305": "该模型当前访问量过大（平台级过载），稍后再试",
+        "1308": "已达到用量上限，会在 next_flush_time 重置",
+        "1310": "已达到每周/每月使用上限，会在 next_flush_time 重置",
+        "1214": "参数非法（模型名或参数不支持）",
     }
+    # 额度类错误：重试无意义（等不到重置就重试只会白费调用次数），应直接换 Provider
+    QUOTA_CODES = {"1308", "1310", "1113"}
 
     def _call_provider(
         self, provider: dict, prompt: str, projects_json: str
@@ -202,6 +203,19 @@ class LLMAnalyzer:
 
             if response.status_code != 200:
                 error = self._describe_error(response)
+                code, _message = self._parse_error(response)
+
+                # 额度类错误（1308/1310/1113）：重试等到重置没有意义，直接换下一个 Provider
+                if code in self.QUOTA_CODES:
+                    self.log.error(
+                        "Provider %s 额度已用尽或欠费（code=%s，%.1fs）：%s → 切换下一个 Provider",
+                        provider.get("name"),
+                        code,
+                        elapsed,
+                        error,
+                    )
+                    return None, error
+
                 # 自愈：若厂商不接受我们的 extra_body（例如某模型不支持 thinking 字段），
                 # 去掉它再试一次，而不是直接降级。
                 if response.status_code in (400, 422) and extra_body:
@@ -225,7 +239,7 @@ class LLMAnalyzer:
                     elapsed,
                     error,
                 )
-                self._sleep_before_retry(attempt, why="限流或服务端错误")
+                self._sleep_before_retry(attempt, why="限流或服务端错误", code=code)
                 continue
 
             try:
@@ -247,6 +261,13 @@ class LLMAnalyzer:
                 continue
 
             parsed = _extract_json(content)
+            if parsed is not None and not _looks_like_result(parsed):
+                # 合法 JSON 但形状不对（例如只返回 {}）：这是"假成功"，
+                # 如果不拦住，会产出一份每项都写"AI 未返回分析"的空壳日报。
+                error = f"返回的 JSON 缺少必需字段（summary/projects）：{sanitize_text(content, 120)}"
+                self.log.warning("%s", error)
+                messages = self._repair_messages(prompt, content)
+                continue
             if parsed is not None:
                 self.log.info(
                     "LLM 调用成功：provider=%s 耗时 %.1fs，本次 tokens in/out=%s/%s，全文 %d 字",
@@ -261,45 +282,58 @@ class LLMAnalyzer:
             # JSON 修复：只允许一次
             error = f"输出不是合法 JSON（前 120 字：{sanitize_text(content, 120)}）"
             self.log.warning("输出非 JSON，尝试修复（第 %d 次）", attempt)
-            messages = [
-                {"role": "user", "content": prompt},
-                {"role": "assistant", "content": content[:4000]},
-                {"role": "user", "content": "上面的输出不是合法 JSON。请只输出符合要求的 JSON 对象，不要任何解释或代码块围栏。"},
-            ]
+            messages = self._repair_messages(prompt, content)
         return None, error
 
-    def _sleep_before_retry(self, attempt: int, *, why: str) -> None:
-        """重试前必须等待：免费档并发常常是 1，立刻重试只会再次被限流。"""
+    @staticmethod
+    def _repair_messages(prompt: str, content: str) -> list[dict[str, str]]:
+        return [
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": content[:4000]},
+            {"role": "user", "content": "上面的输出不是合法 JSON。请只输出符合要求的 JSON 对象，不要任何解释或代码块围栏。"},
+        ]
+
+    def _sleep_before_retry(self, attempt: int, *, why: str, code: str = "") -> None:
+        """重试前必须等待：免费档并发常常是 1，立刻重试只会再次被限流。
+
+        1305 是平台级过载（"该模型当前访问量过大"），官方建议就是稍后再试，
+        因此等待时间要更长一些，否则重试没有意义。
+        """
         if self.calls >= self.max_calls_total:
             return
-        delay = min(self.retry_backoff * attempt, 60.0)
+        delay = min(self.retry_backoff * attempt, 90.0)
+        if code == "1305":
+            delay = max(delay, self.overload_backoff)
+            why = f"{why}（1305 模型访问量过大）"
+        elif code == "1302":
+            why = f"{why}（1302 账户速率限制）"
         self.log.info("%s → 等待 %.0fs 后重试", why, delay)
         time.sleep(delay)
 
-    def _describe_error(self, response) -> str:
-        """把服务端的错误原文带出来（只说 HTTP 429 无法定位原因）。"""
-        status = response.status_code
-        code = message = ""
+    @staticmethod
+    def _parse_error(response) -> tuple[str, str]:
+        """从服务端响应里取出 (code, message) 原文。"""
         try:
             payload = response.json()
         except ValueError:
-            payload = None
-        if isinstance(payload, dict):
-            err = payload.get("error")
-            if isinstance(err, dict):
-                code = str(err.get("code") or err.get("type") or "")
-                message = str(err.get("message") or "")
-            elif err:
-                message = str(err)
-            if not message:
-                message = str(payload.get("message") or payload.get("msg") or "")
-        if not message and not code:
-            message = sanitize_text(getattr(response, "text", ""), 200)
-        hint = self.ERROR_HINTS.get(code)
+            return "", sanitize_text(getattr(response, "text", ""), 200)
+        if not isinstance(payload, dict):
+            return "", ""
+        err = payload.get("error")
+        if isinstance(err, dict):
+            return str(err.get("code") or err.get("type") or ""), str(err.get("message") or "")
+        if err:
+            return "", str(err)
+        return "", str(payload.get("message") or payload.get("msg") or "")
+
+    def _describe_error(self, response) -> str:
+        """把服务端的错误原文带出来（只说 HTTP 429 无法定位原因）。"""
+        code, message = self._parse_error(response)
         detail = f"code={code} message={message}" if code else f"message={message}"
+        hint = self.ERROR_HINTS.get(code)
         if hint:
-            detail += f"（参考：{hint}）"
-        return f"HTTP {status}: {sanitize_text(detail, 300)}"
+            detail += f"（官方说明：{hint}）"
+        return f"HTTP {response.status_code}: {sanitize_text(detail, 300)}"
 
     @staticmethod
     def _finish_reason(payload: dict) -> str:
@@ -438,6 +472,18 @@ def _as_list(value: Any) -> list[str]:
     if isinstance(value, (list, tuple)):
         return [str(item) for item in value if isinstance(item, (str, int, float)) and str(item).strip()]
     return []
+
+
+def _looks_like_result(payload: dict[str, Any]) -> bool:
+    """判断模型输出是否是"有内容的结果"，而不是合法的空壳。
+
+    要求至少有可用的 summary 或非空的 projects，否则视为无效输出。
+    """
+    summary = payload.get("summary")
+    if isinstance(summary, dict) and any(str(v).strip() for v in summary.values()):
+        return True
+    projects = payload.get("projects")
+    return isinstance(projects, list) and len(projects) > 0
 
 
 def _extract_json(text: str) -> dict[str, Any] | None:

@@ -30,6 +30,7 @@ REQUIRED_ENV: tuple[str, ...] = (
 )
 
 OPTIONAL_ENV: tuple[str, ...] = (
+    "LLM_MODEL_2",              # 同厂商备用模型（复用 LLM_API_KEY）
     "LLM_FALLBACK_BASE_URL",
     "LLM_FALLBACK_MODEL",
     "LLM_FALLBACK_API_KEY",

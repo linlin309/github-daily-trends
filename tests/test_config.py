@@ -69,6 +69,32 @@ def test_fallback_provider_kept_when_configured():
     assert cfg["mail"]["to"] == ["sender@163.com", "other@example.com"]
 
 
+def test_same_vendor_alt_model_provider_is_optional():
+    """LLM_MODEL_2 复用主 Key：配了就有同厂商兜底，没配就自动忽略。"""
+    base_env = {
+        "LLM_BASE_URL": "https://open.bigmodel.cn/api/paas/v4/",
+        "LLM_MODEL": "glm-4.7-flash",
+        "LLM_API_KEY": "dummy-llm-key",
+        "MAIL_SMTP_HOST": "smtp.163.com",
+        "MAIL_SMTP_PORT": "465",
+        "MAIL_USERNAME": "sender@163.com",
+        "MAIL_PASSWORD": "dummy-auth-code",
+        "MAIL_TO": "sender@163.com",
+    }
+    without = load_config(ROOT / "config.yaml", env=base_env, strict_env=True)
+    assert [p["name"] for p in without["llm"]["providers"]] == ["zhipu"]
+
+    with_alt = load_config(ROOT / "config.yaml", env=dict(base_env, LLM_MODEL_2="glm-4-flash-250414"), strict_env=True)
+    names = [p["name"] for p in with_alt["llm"]["providers"]]
+    assert names == ["zhipu", "zhipu-alt-model"]
+    alt = with_alt["llm"]["providers"][1]
+    assert alt["model"] == "glm-4-flash-250414"
+    assert alt["api_key"] == base_env["LLM_API_KEY"], "同厂商兜底应复用主 Key，不需要额外 Secret"
+    assert alt["base_url"] == base_env["LLM_BASE_URL"]
+    # 老模型不是思考模型，不应带 thinking 参数
+    assert "extra_body" not in alt or not alt["extra_body"]
+
+
 def test_credentials_never_literal_in_repo_files():
     """源码/配置/测试中不得出现可用的凭据字面量（只允许占位符）。"""
     import re
