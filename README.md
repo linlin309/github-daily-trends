@@ -1,6 +1,6 @@
 # GitHub 每日软件趋势
 
-每天 **12:00（Asia/Shanghai）** 自动跑一次：从 GitHub Trending 发现正在升温的项目，用**规则**筛掉教程 / Awesome List / 文档 / 数据集，用 GitHub API 补全客观数据，按**可解释的固定公式**算热度分，做多样性选择，最多挑出 **10 个**真正值得关注的软件项目，让 AI 写一份简洁中文日报，存进仓库形成长期历史，并发一封 HTML 邮件。
+每天 **12:07（北京时间）** 自动跑一次（定时触发目前不可靠，见「每天 12:07 是怎么跑的」一节的已知问题）：从 GitHub Trending 发现正在升温的项目，用**规则**筛掉教程 / Awesome List / 文档 / 数据集，用 GitHub API 补全客观数据，按**可解释的固定公式**算热度分，做多样性选择，最多挑出 **10 个**真正值得关注的软件项目，让 AI 写一份简洁中文日报，存进仓库形成长期历史，并发一封 HTML 邮件。
 
 **成本约 0 元/月**（公开仓库 Actions 免费 + 智谱免费模型 + 163 SMTP）。
 
@@ -45,7 +45,7 @@ Search 兜底(可选)                                              │
 
 ```text
 .github/workflows/
-├── daily-report.yml        # 每天 12:00 Asia/Shanghai：跑测试 → 生成 → 提交 → 发邮件
+├── daily-report.yml        # 每天 12:07 北京时间：跑测试 → 生成 → 提交 → 发邮件
 └── parser-canary.yml       # 每周一解析自检：Trending 页面改版当周暴露
 
 src/
@@ -67,7 +67,7 @@ src/
 
 prompts/analyze.md          # 提示词（事实边界 + 注入防护 + 输出 schema）
 templates/email.html.j2     # 邮件模板（表格布局 + 内联样式 + 自动转义）
-tests/                      # 67 个测试 + 真实 Trending HTML fixture
+tests/                      # 80 个测试 + 真实 Trending HTML fixture
 scripts/fetch_fixture.py    # 保存真实页面为 fixture
 scripts/check_trending.py   # 线上解析自检（canary）
 scripts/check_llm.py        # LLM 探针：几秒钟定位 429/超时/模型名/额度问题
@@ -82,7 +82,7 @@ reports/YYYY-MM-DD.json     # 机器读历史（未来趋势分析的接口）
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest tests -q                # 67 个测试，约 1 秒
+python -m pytest tests -q                # 80 个测试，约 1 秒
 ```
 
 四种本地模式：
@@ -141,23 +141,32 @@ python -m src.main --send-only --date 2026-09-12     # 只发邮件（读已落�
 
 ---
 
-## 每天 12:00 是怎么跑的
+## 每天 12:07 是怎么跑的
 
 ```yaml
 on:
   schedule:
-    - cron: '0 12 * * *'
-      timezone: 'Asia/Shanghai'      # 官方支持的 IANA 时区，无需手工换算 UTC
+    - cron: '7 4 * * *'          # 12:07 北京时间 = 04:07 UTC
 ```
 
-作业步骤：`verify`（跑 67 个测试）→ 计算报告日期 → 幂等检查 → 生成报告 → 提交 `reports/` → 发送邮件。
+> **`schedule` 只支持标准 cron，且按 UTC 计算。** GitHub 官方文档
+> （events-that-trigger-workflows 的 `schedule` 小节）里**没有 `timezone` 字段**——
+> 写 IANA 时区不会生效，只会让人误以为已经按本地时间调度。所以这里直接写 UTC，
+> 并由代码侧用 `ZoneInfo("Asia/Shanghai")` 决定报告日期。
+
+作业步骤：`verify`（跑测试）→ 计算报告日期 → 幂等检查 → 生成报告 → 提交 `reports/` → 发送邮件。
 
 必须知道的四点：
 
 1. **日期永远以 `Asia/Shanghai` 计算**（`ZoneInfo`），从不使用 `utcnow().date()`。即使延迟到 UTC 次日才跑，报告日期依然正确。
-2. **正点是 GitHub 最繁忙的时刻**，定时任务可能延迟几分钟到几十分钟（官方文档明确说明）。日报不在乎晚几分钟，不影响正确性；想更稳可以把 `cron` 改成 `7 12 * * *`。
+2. **正点（`0` 分）是 GitHub 最繁忙的时刻**，定时任务可能延迟几分钟到几十分钟，负载过高时甚至会被丢弃（官方文档明确说明）。所以这里用 `7` 分而不是 `0` 分。
 3. **公开仓库 60 天无活动会自动禁用定时任务**。本仓库每天都在提交，通常不会触发；如果某天没收到邮件，去 Actions 页面点一下 **Enable workflow** 即可。
-4. **定时任务只在默认分支上生效**，且必须先把这个 workflow 文件推上去（第一次可能要等几分钟）。
+4. **定时任务只在默认分支上生效**，且必须先把这个 workflow 文件推上去。
+
+> ⚠️ **已知问题**：本仓库的 `schedule` 触发器实测**从未成功触发过**（多次受控验证见下）。
+> 手动 `workflow_dispatch` 正常，工作流也已被 GitHub 正常登记，但定时事件一次都没产生。
+> 因此**不要假设它每天会自己跑**——需要稳定送达时请改用下述兜底方案。
+> 验证方法：`gh run list --json event | grep schedule`，看到 `event=schedule` 才算真正跑通。
 
 ### 手动触发（补跑 / 重发 / 试跑）
 

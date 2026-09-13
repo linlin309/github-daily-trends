@@ -2,7 +2,14 @@
 
 评审日期：2026-09-12
 评审对象：`https://github.com/linlin309/-`（已核实：**公开仓库**，默认分支 `main`，当前仅有 LICENSE）
-状态：**方案阶段，未写实现代码**
+状态：**方案阶段，未写实现代码（历史存档，勿照抄配置）**
+
+> ⚠️ **事后更正（2026-09-13）**：本文第 5 条以及第 8 节关于
+> "`schedule` 支持 IANA `timezone` 字段"的结论是**错误的**。
+> GitHub 官方文档 `on.schedule` 小节通篇没有 `timezone` 字段，Actions changelog 里
+> 也没有该功能；写成 `timezone: 'Asia/Shanghai'` 不会生效，cron 仍按 **UTC** 解释。
+> 正确做法是直接写 UTC 等价值（12:07 北京 → `cron: '7 4 * * *'`），
+> 报告日期仍由代码侧 `ZoneInfo("Asia/Shanghai")` 推导。详见仓库 README。
 
 ---
 
