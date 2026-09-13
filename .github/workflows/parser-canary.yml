@@ -4,8 +4,9 @@ name: parser-canary
 # 而不是某天悄悄降级成 Search 兜底。
 on:
   schedule:
-    - cron: '0 9 * * 1'
-      timezone: 'Asia/Shanghai'
+    # 周一 09:00（北京时间）= 周一 01:00 UTC。
+    # schedule 只支持标准 cron 且按 UTC 计算，官方文档没有 timezone 字段。
+    - cron: '0 1 * * 1'
   workflow_dispatch:
 
 permissions:
