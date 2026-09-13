@@ -1,10 +1,14 @@
 name: daily-report
 
-# 每天 12:00（Asia/Shanghai）自动运行；也支持手动触发（补跑 / 重发 / dry-run）
+# 自动运行时间见下方 schedule；也支持手动触发（补跑 / 重发 / dry-run）
 on:
   schedule:
-    - cron: '0 12 * * *'
+    # ==== 临时触发验证条目，验证完成后立即删除 ====
+    # A：带 IANA 时区。timezone 生效 → 触发于 UTC 06:54；被忽略 → 触发于 UTC 14:54（8 小时后）
+    - cron: '54 14 * * *'
       timezone: 'Asia/Shanghai'
+    # B：不带 timezone（官方默认按 UTC）→ 触发于 UTC 07:03
+    - cron: '3 7 * * *'
   workflow_dispatch:
     inputs:
       date:
