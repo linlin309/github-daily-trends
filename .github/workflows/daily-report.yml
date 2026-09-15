@@ -55,6 +55,9 @@ jobs:
       LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
       LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
       LLM_MODEL: ${{ vars.LLM_MODEL }}
+      # 同厂商备用模型（复用 LLM_API_KEY）。漏了这一行，config 会把该 provider
+      # 当成"变量未提供"直接丢弃，1305 过载时就没有第二条腿可换。
+      LLM_MODEL_2: ${{ vars.LLM_MODEL_2 }}
       LLM_FALLBACK_API_KEY: ${{ secrets.LLM_FALLBACK_API_KEY }}
       LLM_FALLBACK_BASE_URL: ${{ vars.LLM_FALLBACK_BASE_URL }}
       LLM_FALLBACK_MODEL: ${{ vars.LLM_FALLBACK_MODEL }}

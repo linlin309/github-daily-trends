@@ -110,8 +110,27 @@ def load_config(
     if missing_required:
         log.warning("（测试模式）缺少环境变量: %s", ", ".join(missing_required))
 
-    # 备用 provider 缺失时静默降级为"只有一个 provider"
-    providers = [p for p in (config.get("llm", {}).get("providers") or []) if p.get("base_url") and p.get("model") and p.get("api_key")]
+    # 备用 provider 的变量没提供时会被丢弃——必须是"有声响"的降级：
+    # 否则使用者配了 LLM_MODEL_2 却因为工作流 env 漏传而被静默忽略，只能靠猜。
+    missing_optional = sorted(set(OPTIONAL_ENV) & missing)
+    if missing_optional:
+        log.warning(
+            "以下可选环境变量未提供，对应的备用 Provider 会被跳过: %s"
+            "（若已配置却仍看到本提示，检查工作流 env: 是否把它传进来了）",
+            ", ".join(missing_optional),
+        )
+
+    declared = config.get("llm", {}).get("providers") or []
+    providers = [p for p in declared if p.get("base_url") and p.get("model") and p.get("api_key")]
+    for dropped in declared:
+        if dropped in providers:
+            continue
+        blank = [f for f in ("base_url", "model", "api_key") if not dropped.get(f)]
+        log.warning(
+            "LLM provider %r 因字段为空被丢弃（%s），本次不会调用它",
+            dropped.get("name") or "<未命名>",
+            ", ".join(blank),
+        )
     if not providers and strict_env:
         raise ConfigError("llm.providers 为空：至少需要一个可用的 LLM provider（检查 LLM_BASE_URL / LLM_MODEL / LLM_API_KEY）")
     config.setdefault("llm", {})["providers"] = providers

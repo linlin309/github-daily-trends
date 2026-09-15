@@ -104,3 +104,49 @@ def test_credentials_never_literal_in_repo_files():
         assert not suspicious.search(text), f"{path} 中疑似出现真实凭据"
     config_text = (ROOT / "config.yaml").read_text(encoding="utf-8")
     assert "${LLM_API_KEY}" in config_text and "${MAIL_PASSWORD}" in config_text
+
+
+def _config_placeholders() -> set[str]:
+    """config.yaml 里作为「整个值」出现的 ${VAR}（与 _resolve 的判定口径一致）。
+
+    走 YAML 解析而不是正则扫原文，这样注释里举例的 ${VAR} 不会被误判为真实依赖。
+    """
+    import re
+
+    import yaml
+
+    raw = yaml.safe_load((ROOT / "config.yaml").read_text(encoding="utf-8"))
+    found: set[str] = set()
+
+    def walk(node):
+        if isinstance(node, dict):
+            for value in node.values():
+                walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value)
+        elif isinstance(node, str):
+            match = re.fullmatch(r"\$\{([A-Z0-9_]+)\}", node.strip())
+            if match:
+                found.add(match.group(1))
+
+    walk(raw)
+    return found
+
+
+def test_workflows_forward_every_config_variable():
+    """回归测试：config.yaml 用到的变量必须出现在工作流的 env: 里。
+
+    漏传时 config 会把对应 provider/收件人静默丢弃——LLM_MODEL_2 就这样被忽略过，
+    线上表现为「明明配了备用模型却从不调用」，日志里毫无痕迹。
+    """
+    import re
+
+    needed = _config_placeholders()
+    assert needed, "没有解析到任何占位符，测试本身可能失效了"
+
+    for workflow in ("daily-report.yml", "llm-probe.yml"):
+        body = (ROOT / ".github" / "workflows" / workflow).read_text(encoding="utf-8")
+        forwarded = set(re.findall(r"^\s*([A-Z0-9_]+):\s*\$\{\{", body, flags=re.MULTILINE))
+        missing = sorted(needed - forwarded)
+        assert not missing, f"{workflow} 的 env: 没有传入这些变量，会被静默忽略: {missing}"
