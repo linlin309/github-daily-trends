@@ -12,3 +12,7 @@ preview/
 .pytest_cache/
 .mimosa/
 .playwright-mcp/
+
+# ---- 本地过程文档（需求原文、方案评审稿）：留本地，不上传 ----
+需求.md
+docs/
