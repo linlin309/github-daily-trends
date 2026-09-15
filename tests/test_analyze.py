@@ -213,6 +213,25 @@ def test_overload_1305_waits_longer(fast_cfg, monkeypatch):
     assert slept and slept[0] == 45, f"1305 过载应按 overload_backoff_seconds 等待，实际 {slept}"
 
 
+def test_overload_1305_exhausts_primary_then_uses_alt_model(fast_cfg, monkeypatch):
+    """回归测试（2026-09-14 线上事故）：1305 打满主 Provider 后必须换到同厂商备用模型。
+
+    当时备用模型明明配了却没被调用——工作流的 env: 漏传 LLM_MODEL_2，provider 链被静默
+    削成只剩一个，两次重试全撞在同一个过载模型上，日报降级为纯数据版（没有 AI 概览）。
+    """
+    monkeypatch.setattr("src.analyze.time.sleep", lambda seconds: None)
+    overload = (429, {"error": {"code": "1305", "message": "该模型当前访问量过大，请您稍后再试"}})
+    http = FakeHttp([overload, overload, json.dumps(good_payload(), ensure_ascii=False)])
+    projects = [make("a/real")]
+
+    result = LLMAnalyzer(fast_cfg, http, project_root=ROOT).analyze(projects, today=TODAY)
+
+    assert result.ok is True, f"备用模型可用时不应降级，实际原因：{result.degraded_reason}"
+    assert result.provider == "fallback", f"应切换到备用 Provider，实际是 {result.provider}"
+    assert len(http.calls) == 3, "主 Provider 重试 2 次失败后换备用，共 3 次调用"
+    assert result.calls <= fast_cfg["max_calls_total"]
+
+
 def test_fatal_401_is_not_retried(fast_cfg):
     """401/403/404 这类错误重试没有意义：每个 provider 只应该打一次。"""
     http = FakeHttp(
