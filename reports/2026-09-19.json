@@ -1,0 +1,3525 @@
+{
+  "date": "2026-09-19",
+  "generated_at": "2026-09-19T15:17:21+08:00",
+  "mode": "trending",
+  "weights_version": "2026-09-12",
+  "counts": {
+    "candidates": 129,
+    "after_filter": 111,
+    "selected": 10,
+    "target": 10
+  },
+  "selection": {
+    "stopped_reason": "target_reached",
+    "floor": 35.0
+  },
+  "sources": {
+    "ok": [
+      "daily",
+      "weekly",
+      "lang:python",
+      "lang:typescript",
+      "lang:javascript",
+      "lang:go",
+      "lang:rust",
+      "lang:java"
+    ],
+    "failed": []
+  },
+  "llm": {
+    "ok": true,
+    "provider": "zhipu",
+    "model": "glm-4.7-flash",
+    "calls": 2,
+    "degraded_reason": null,
+    "tokens": {
+      "in": 3200,
+      "out": 1241
+    },
+    "demo": false,
+    "notes": []
+  },
+  "degraded": [],
+  "summary": {
+    "headline": "AI 代理与开发工具成今日热点",
+    "trends": [
+      "AI 代理与开发环境工具热度攀升",
+      "金融与存储领域出现新趋势项目",
+      "安全与监控工具持续受到关注"
+    ],
+    "highlights": [
+      "Orca 与 Coder 等代理工具发布新版本",
+      "Ghidra 与 RustFS 等工具持续增长"
+    ]
+  },
+  "selected": [
+    {
+      "rank": 1,
+      "full_name": "asciimoo/hister",
+      "url": "https://github.com/asciimoo/hister",
+      "description": "Your own search engine",
+      "stars": 5032,
+      "stars_today": 889,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 889.0,
+      "forks": 211,
+      "language": "Go",
+      "topics": [
+        "browser-history",
+        "go",
+        "golang",
+        "history",
+        "index",
+        "mcp",
+        "mcp-server",
+        "personal-search",
+        "personal-search-engine",
+        "privacy",
+        "search",
+        "search-engine",
+        "semantic-search",
+        "web"
+      ],
+      "created_at": "2026-01-04T10:25:21Z",
+      "pushed_at": "2026-09-18T12:36:05Z",
+      "license": "AGPL-3.0",
+      "archived": false,
+      "open_issues": 65,
+      "has_manifest": true,
+      "manifests_found": [
+        "Dockerfile",
+        "go.mod",
+        "package.json"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-02-23T14:45:02Z",
+      "markup_ratio": 0.0,
+      "group": "ai",
+      "category": "ai-agent",
+      "software_score": 0.75,
+      "software_status": "keep",
+      "trend_score": 86.69,
+      "score_breakdown": {
+        "velocity": {
+          "value": 889.0,
+          "source": "trending",
+          "norm": 0.8482,
+          "weight": 0.4,
+          "contribution": 33.93
+        },
+        "scale": {
+          "value": 5032,
+          "norm": 0.6983,
+          "weight": 0.2,
+          "contribution": 13.97
+        },
+        "rank": {
+          "value": 3,
+          "norm": 0.92,
+          "weight": 0.15,
+          "contribution": 13.8
+        },
+        "freshness": {
+          "days_since_first_seen": 0,
+          "norm": 1.0,
+          "weight": 0.15,
+          "contribution": 15.0
+        },
+        "source": {
+          "value": [
+            "daily",
+            "lang:go"
+          ],
+          "weight": 0.1,
+          "norm": 1.0,
+          "contribution": 10.0
+        }
+      },
+      "adjusted_score": 86.69,
+      "penalties": {},
+      "sources": [
+        "daily",
+        "lang:go"
+      ],
+      "source_ranks": {
+        "daily": 17,
+        "lang:go": 3
+      },
+      "best_rank": 3,
+      "first_seen": "2026-09-19",
+      "days_since_first_seen": 0,
+      "trending_streak_days": 1,
+      "recently_reported": false,
+      "injection_suspected": false,
+      "tags": [
+        "今日最值得关注"
+      ],
+      "ai": {
+        "summary": "个人搜索引擎",
+        "what_it_is": "基于浏览历史的个人搜索引擎，支持隐私保护。",
+        "why_worth_attention": "今日首次上榜，增长迅速，聚焦隐私与个人数据管理。",
+        "use_case": "本地化搜索个人浏览历史记录。",
+        "target_user": "注重隐私的极客用户。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 2,
+      "full_name": "Fission-AI/OpenSpec",
+      "url": "https://github.com/Fission-AI/OpenSpec",
+      "description": "Spec-driven development (SDD) for AI coding assistants.",
+      "stars": 69467,
+      "stars_today": 296,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 296.0,
+      "forks": 4760,
+      "language": "TypeScript",
+      "topics": [
+        "ai",
+        "context-engineering",
+        "engineering",
+        "planning",
+        "prd",
+        "sdd",
+        "sdlc",
+        "spec",
+        "spec-driven-development",
+        "specification"
+      ],
+      "created_at": "2025-08-05T10:37:45Z",
+      "pushed_at": "2026-09-18T23:23:30Z",
+      "license": "MIT",
+      "archived": false,
+      "open_issues": 236,
+      "has_manifest": true,
+      "manifests_found": [
+        "package.json"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-09-17T01:11:07Z",
+      "markup_ratio": 0.0,
+      "group": "ai",
+      "category": "ai-app",
+      "software_score": 1.0,
+      "software_status": "keep",
+      "trend_score": 85.51,
+      "score_breakdown": {
+        "velocity": {
+          "value": 296.0,
+          "source": "trending",
+          "norm": 0.7111,
+          "weight": 0.4,
+          "contribution": 28.44
+        },
+        "scale": {
+          "value": 69467,
+          "norm": 0.9134,
+          "weight": 0.2,
+          "contribution": 18.27
+        },
+        "rank": {
+          "value": 3,
+          "norm": 0.92,
+          "weight": 0.15,
+          "contribution": 13.8
+        },
+        "freshness": {
+          "days_since_first_seen": 0,
+          "norm": 1.0,
+          "weight": 0.15,
+          "contribution": 15.0
+        },
+        "source": {
+          "value": [
+            "daily",
+            "lang:typescript"
+          ],
+          "weight": 0.1,
+          "norm": 1.0,
+          "contribution": 10.0
+        }
+      },
+      "adjusted_score": 85.51,
+      "penalties": {},
+      "sources": [
+        "daily",
+        "lang:typescript"
+      ],
+      "source_ranks": {
+        "daily": 8,
+        "lang:typescript": 3
+      },
+      "best_rank": 3,
+      "first_seen": "2026-09-19",
+      "days_since_first_seen": 0,
+      "trending_streak_days": 1,
+      "recently_reported": false,
+      "injection_suspected": false,
+      "tags": [
+        "今日最值得关注"
+      ],
+      "ai": {
+        "summary": "AI 编码助手规范驱动开发",
+        "what_it_is": "为 AI 编码助手提供规范驱动开发（SDD）框架。",
+        "why_worth_attention": "今日发布新版本并上榜，连接 PRD 与 AI 开发流程。",
+        "use_case": "将产品需求文档转化为 AI 可执行的代码规范。",
+        "target_user": "AI 辅助编程开发者。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 3,
+      "full_name": "stablyai/orca",
+      "url": "https://github.com/stablyai/orca",
+      "description": "Orca is the ADE for working with a fleet of parallel agents. Run any coding agent with your own subscription. Available on desktop, mobile and remote runtime.",
+      "stars": 72142,
+      "stars_today": 831,
+      "stars_this_week": 5272,
+      "stars_today_source": "trending",
+      "velocity_value": 831.0,
+      "forks": 4722,
+      "language": "TypeScript",
+      "topics": [
+        "ade",
+        "agent-ide",
+        "ai-agents",
+        "claude-code",
+        "cli",
+        "codex",
+        "cursor-agent",
+        "devtools",
+        "ghostty",
+        "ide",
+        "mobile-app",
+        "opencode",
+        "orchestration",
+        "parallel-agents",
+        "pi",
+        "terminal",
+        "worktrees",
+        "yc-backed"
+      ],
+      "created_at": "2026-03-17T03:28:57Z",
+      "pushed_at": "2026-09-19T07:17:31Z",
+      "license": "MIT",
+      "archived": false,
+      "open_issues": 6331,
+      "has_manifest": true,
+      "manifests_found": [
+        "package.json"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-09-18T06:19:48Z",
+      "markup_ratio": 0.0,
+      "group": "dev-tools",
+      "category": "cli",
+      "software_score": 1.0,
+      "software_status": "keep",
+      "trend_score": 83.22,
+      "score_breakdown": {
+        "velocity": {
+          "value": 831.0,
+          "source": "trending",
+          "norm": 0.8398,
+          "weight": 0.4,
+          "contribution": 33.59
+        },
+        "scale": {
+          "value": 72142,
+          "norm": 0.9165,
+          "weight": 0.2,
+          "contribution": 18.33
+        },
+        "rank": {
+          "value": 13,
+          "norm": 0.52,
+          "weight": 0.15,
+          "contribution": 7.8
+        },
+        "freshness": {
+          "days_since_first_seen": 1,
+          "norm": 1.0,
+          "weight": 0.15,
+          "contribution": 15.0
+        },
+        "source": {
+          "value": [
+            "lang:typescript",
+            "weekly"
+          ],
+          "weight": 0.1,
+          "norm": 0.85,
+          "contribution": 8.5
+        }
+      },
+      "adjusted_score": 83.22,
+      "penalties": {},
+      "sources": [
+        "lang:typescript",
+        "weekly"
+      ],
+      "source_ranks": {
+        "weekly": 16,
+        "lang:typescript": 13
+      },
+      "best_rank": 13,
+      "first_seen": "2026-09-18",
+      "days_since_first_seen": 1,
+      "trending_streak_days": 1,
+      "recently_reported": false,
+      "injection_suspected": false,
+      "tags": [
+        "今日最值得关注"
+      ],
+      "ai": {
+        "summary": "AI 代理运行时环境",
+        "what_it_is": "用于管理多 AI 代理集群的运行时环境，支持多端运行。",
+        "why_worth_attention": "今日发布新版本，提供统一的代理管理能力。",
+        "use_case": "在桌面、移动端或远程运行多个 AI 编程代理。",
+        "target_user": "AI 代理开发者。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 4,
+      "full_name": "shiyu-coder/Kronos",
+      "url": "https://github.com/shiyu-coder/Kronos",
+      "description": "Kronos: A Foundation Model for the Language of Financial Markets",
+      "stars": 39216,
+      "stars_today": 230,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 230.0,
+      "forks": 6531,
+      "language": "Python",
+      "topics": [],
+      "created_at": "2025-07-01T02:54:32Z",
+      "pushed_at": "2026-04-13T12:38:49Z",
+      "license": "MIT",
+      "archived": false,
+      "open_issues": 275,
+      "has_manifest": true,
+      "manifests_found": [
+        "requirements.txt"
+      ],
+      "has_release": false,
+      "latest_release_at": null,
+      "markup_ratio": 0.0,
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_score": 0.55,
+      "software_status": "keep",
+      "trend_score": 79.42,
+      "score_breakdown": {
+        "velocity": {
+          "value": 230.0,
+          "source": "trending",
+          "norm": 0.6797,
+          "weight": 0.4,
+          "contribution": 27.19
+        },
+        "scale": {
+          "value": 39216,
+          "norm": 0.8665,
+          "weight": 0.2,
+          "contribution": 17.33
+        },
+        "rank": {
+          "value": 7,
+          "norm": 0.76,
+          "weight": 0.15,
+          "contribution": 11.4
+        },
+        "freshness": {
+          "days_since_first_seen": 0,
+          "norm": 1.0,
+          "weight": 0.15,
+          "contribution": 15.0
+        },
+        "source": {
+          "value": [
+            "lang:python"
+          ],
+          "weight": 0.1,
+          "norm": 0.85,
+          "contribution": 8.5
+        }
+      },
+      "adjusted_score": 79.42,
+      "penalties": {},
+      "sources": [
+        "lang:python"
+      ],
+      "source_ranks": {
+        "lang:python": 7
+      },
+      "best_rank": 7,
+      "first_seen": "2026-09-19",
+      "days_since_first_seen": 0,
+      "trending_streak_days": 1,
+      "recently_reported": false,
+      "injection_suspected": false,
+      "tags": [
+        "今日潜力项目"
+      ],
+      "ai": {
+        "summary": "金融语言基础模型",
+        "what_it_is": "专注于金融市场的语言基础模型。",
+        "why_worth_attention": "今日首次上榜，聚焦垂直领域 AI 模型。",
+        "use_case": "处理金融文本数据、市场分析。",
+        "target_user": "金融科技从业者。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 5,
+      "full_name": "supermemoryai/supermemory",
+      "url": "https://github.com/supermemoryai/supermemory",
+      "description": "Memory and context engine + app that is extremely fast, scalable, and can be run fully locally. The Memory API for the AI era.",
+      "stars": 30412,
+      "stars_today": 140,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 140.0,
+      "forks": 2648,
+      "language": "TypeScript",
+      "topics": [
+        "agent-memory",
+        "ai-memory",
+        "cloudflare-kv",
+        "cloudflare-pages",
+        "cloudflare-workers",
+        "drizzle-orm",
+        "memory",
+        "postgres",
+        "remix",
+        "tailwindcss",
+        "typescript",
+        "vite"
+      ],
+      "created_at": "2024-02-27T20:10:04Z",
+      "pushed_at": "2026-09-18T22:02:30Z",
+      "license": "MIT",
+      "archived": false,
+      "open_issues": 107,
+      "has_manifest": true,
+      "manifests_found": [
+        "package.json"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-08-17T18:39:22Z",
+      "markup_ratio": 0.0,
+      "group": "data",
+      "category": "database",
+      "software_score": 0.75,
+      "software_status": "keep",
+      "trend_score": 79.84,
+      "score_breakdown": {
+        "velocity": {
+          "value": 140.0,
+          "source": "trending",
+          "norm": 0.6181,
+          "weight": 0.4,
+          "contribution": 24.72
+        },
+        "scale": {
+          "value": 30412,
+          "norm": 0.8457,
+          "weight": 0.2,
+          "contribution": 16.91
+        },
+        "rank": {
+          "value": 4,
+          "norm": 0.88,
+          "weight": 0.15,
+          "contribution": 13.2
+        },
+        "freshness": {
+          "days_since_first_seen": 0,
+          "norm": 1.0,
+          "weight": 0.15,
+          "contribution": 15.0
+        },
+        "source": {
+          "value": [
+            "daily",
+            "lang:typescript"
+          ],
+          "weight": 0.1,
+          "norm": 1.0,
+          "contribution": 10.0
+        }
+      },
+      "adjusted_score": 76.84,
+      "penalties": {
+        "language": 3.0
+      },
+      "sources": [
+        "daily",
+        "lang:typescript"
+      ],
+      "source_ranks": {
+        "daily": 11,
+        "lang:typescript": 4
+      },
+      "best_rank": 4,
+      "first_seen": "2026-09-19",
+      "days_since_first_seen": 0,
+      "trending_streak_days": 1,
+      "recently_reported": false,
+      "injection_suspected": false,
+      "tags": [
+        "今日潜力项目"
+      ],
+      "ai": {
+        "summary": "AI 记忆与上下文引擎",
+        "what_it_is": "高性能、可本地运行的 AI 记忆 API 引擎。",
+        "why_worth_attention": "今日首次上榜，强调本地化与可扩展性。",
+        "use_case": "为 AI 应用提供持久化上下文存储。",
+        "target_user": "构建 AI 应用的开发者。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 6,
+      "full_name": "louislam/uptime-kuma",
+      "url": "https://github.com/louislam/uptime-kuma",
+      "description": "A fancy self-hosted monitoring tool",
+      "stars": 91546,
+      "stars_today": 61,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 61.0,
+      "forks": 8438,
+      "language": "JavaScript",
+      "topics": [
+        "docker",
+        "monitor",
+        "monitoring",
+        "responsive",
+        "self-hosted",
+        "selfhosted",
+        "single-page-app",
+        "socket-io",
+        "uptime",
+        "uptime-monitoring",
+        "webapp",
+        "websocket"
+      ],
+      "created_at": "2021-07-03T01:02:42Z",
+      "pushed_at": "2026-09-19T00:06:36Z",
+      "license": "MIT",
+      "archived": false,
+      "open_issues": 811,
+      "has_manifest": true,
+      "manifests_found": [
+        "package.json"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-09-16T13:31:07Z",
+      "markup_ratio": 0.0,
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_score": 1.0,
+      "software_status": "keep",
+      "trend_score": 74.24,
+      "score_breakdown": {
+        "velocity": {
+          "value": 61.0,
+          "source": "trending",
+          "norm": 0.5155,
+          "weight": 0.4,
+          "contribution": 20.62
+        },
+        "scale": {
+          "value": 91546,
+          "norm": 0.936,
+          "weight": 0.2,
+          "contribution": 18.72
+        },
+        "rank": {
+          "value": 7,
+          "norm": 0.76,
+          "weight": 0.15,
+          "contribution": 11.4
+        },
+        "freshness": {
+          "days_since_first_seen": 0,
+          "norm": 1.0,
+          "weight": 0.15,
+          "contribution": 15.0
+        },
+        "source": {
+          "value": [
+            "lang:javascript"
+          ],
+          "weight": 0.1,
+          "norm": 0.85,
+          "contribution": 8.5
+        }
+      },
+      "adjusted_score": 74.24,
+      "penalties": {},
+      "sources": [
+        "lang:javascript"
+      ],
+      "source_ranks": {
+        "lang:javascript": 7
+      },
+      "best_rank": 7,
+      "first_seen": "2026-09-19",
+      "days_since_first_seen": 0,
+      "trending_streak_days": 1,
+      "recently_reported": false,
+      "injection_suspected": false,
+      "tags": [
+        "今日最实用"
+      ],
+      "ai": {
+        "summary": "自托管监控工具",
+        "what_it_is": "功能丰富的自托管网站与服务器监控工具。",
+        "why_worth_attention": "今日首次上榜，提供可视化的监控体验。",
+        "use_case": "监控网站可用性、服务器状态。",
+        "target_user": "运维工程师。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 7,
+      "full_name": "NationalSecurityAgency/ghidra",
+      "url": "https://github.com/NationalSecurityAgency/ghidra",
+      "description": "Ghidra is a software reverse engineering (SRE) framework",
+      "stars": 78955,
+      "stars_today": 572,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 572.0,
+      "forks": 8731,
+      "language": "Java",
+      "topics": [
+        "disassembler",
+        "reverse-engineering",
+        "software-analysis"
+      ],
+      "created_at": "2019-03-01T03:27:48Z",
+      "pushed_at": "2026-09-18T10:01:09Z",
+      "license": "Apache-2.0",
+      "archived": false,
+      "open_issues": 1960,
+      "has_manifest": true,
+      "manifests_found": [
+        "build.gradle"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-08-18T16:19:52Z",
+      "markup_ratio": 0.0005,
+      "group": "security",
+      "category": "security",
+      "software_score": 1.0,
+      "software_status": "keep",
+      "trend_score": 79.7,
+      "score_breakdown": {
+        "velocity": {
+          "value": 572.0,
+          "source": "trending",
+          "norm": 0.7932,
+          "weight": 0.4,
+          "contribution": 31.73
+        },
+        "scale": {
+          "value": 78955,
+          "norm": 0.9239,
+          "weight": 0.2,
+          "contribution": 18.48
+        },
+        "rank": {
+          "value": 1,
+          "norm": 1.0,
+          "weight": 0.15,
+          "contribution": 15.0
+        },
+        "freshness": {
+          "days_since_first_seen": 7,
+          "norm": 0.4,
+          "weight": 0.15,
+          "contribution": 6.0
+        },
+        "source": {
+          "value": [
+            "lang:java"
+          ],
+          "weight": 0.1,
+          "norm": 0.85,
+          "contribution": 8.5
+        }
+      },
+      "adjusted_score": 67.7,
+      "penalties": {
+        "repeat": 12.0
+      },
+      "sources": [
+        "lang:java"
+      ],
+      "source_ranks": {
+        "lang:java": 1
+      },
+      "best_rank": 1,
+      "first_seen": "2026-09-12",
+      "days_since_first_seen": 7,
+      "trending_streak_days": 4,
+      "recently_reported": true,
+      "injection_suspected": false,
+      "tags": [
+        "今日最实用"
+      ],
+      "ai": {
+        "summary": "软件逆向工程框架",
+        "what_it_is": "由 NSA 开发的软件逆向工程（SRE）框架。",
+        "why_worth_attention": "连续多日上榜，持续受到安全研究社区关注。",
+        "use_case": "软件分析、漏洞挖掘、逆向工程。",
+        "target_user": "安全研究员。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 8,
+      "full_name": "juliangarnier/anime",
+      "url": "https://github.com/juliangarnier/anime",
+      "description": "JavaScript animation engine",
+      "stars": 72907,
+      "stars_today": 29,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 29.0,
+      "forks": 4928,
+      "language": "JavaScript",
+      "topics": [
+        "animation",
+        "anime",
+        "canvas",
+        "css",
+        "javascript",
+        "javascript-library",
+        "svg"
+      ],
+      "created_at": "2016-03-13T21:37:45Z",
+      "pushed_at": "2026-08-21T21:29:50Z",
+      "license": "MIT",
+      "archived": false,
+      "open_issues": 118,
+      "has_manifest": true,
+      "manifests_found": [
+        "package.json"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-06-22T14:57:08Z",
+      "markup_ratio": 0.0,
+      "group": "web",
+      "category": "web-frontend",
+      "software_score": 0.75,
+      "software_status": "keep",
+      "trend_score": 66.04,
+      "score_breakdown": {
+        "velocity": {
+          "value": 29.0,
+          "source": "trending",
+          "norm": 0.4248,
+          "weight": 0.4,
+          "contribution": 16.99
+        },
+        "scale": {
+          "value": 72907,
+          "norm": 0.9173,
+          "weight": 0.2,
+          "contribution": 18.35
+        },
+        "rank": {
+          "value": 14,
+          "norm": 0.48,
+          "weight": 0.15,
+          "contribution": 7.2
+        },
+        "freshness": {
+          "days_since_first_seen": 0,
+          "norm": 1.0,
+          "weight": 0.15,
+          "contribution": 15.0
+        },
+        "source": {
+          "value": [
+            "lang:javascript"
+          ],
+          "weight": 0.1,
+          "norm": 0.85,
+          "contribution": 8.5
+        }
+      },
+      "adjusted_score": 66.04,
+      "penalties": {},
+      "sources": [
+        "lang:javascript"
+      ],
+      "source_ranks": {
+        "lang:javascript": 14
+      },
+      "best_rank": 14,
+      "first_seen": "2026-09-19",
+      "days_since_first_seen": 0,
+      "trending_streak_days": 1,
+      "recently_reported": false,
+      "injection_suspected": false,
+      "tags": [
+        "今日最实用"
+      ],
+      "ai": {
+        "summary": "JavaScript 动画引擎",
+        "what_it_is": "轻量级 JavaScript 动画库，支持 Canvas 与 SVG。",
+        "why_worth_attention": "今日首次上榜，提供高性能动画解决方案。",
+        "use_case": "网页交互动画、数据可视化动画。",
+        "target_user": "前端开发者。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 9,
+      "full_name": "coder/coder",
+      "url": "https://github.com/coder/coder",
+      "description": "Secure environments for developers and their agents",
+      "stars": 15380,
+      "stars_today": 478,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 478.0,
+      "forks": 1508,
+      "language": "Go",
+      "topics": [
+        "agents",
+        "dev-tools",
+        "development-environment",
+        "go",
+        "golang",
+        "ide",
+        "jetbrains",
+        "remote-development",
+        "terraform",
+        "vscode"
+      ],
+      "created_at": "2021-12-22T06:08:52Z",
+      "pushed_at": "2026-09-19T07:02:57Z",
+      "license": "AGPL-3.0",
+      "archived": false,
+      "open_issues": 1047,
+      "has_manifest": true,
+      "manifests_found": [
+        "Makefile",
+        "go.mod",
+        "package.json"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-09-18T17:33:14Z",
+      "markup_ratio": 0.0,
+      "group": "ai",
+      "category": "ai-agent",
+      "software_score": 1.0,
+      "software_status": "keep",
+      "trend_score": 80.03,
+      "score_breakdown": {
+        "velocity": {
+          "value": 478.0,
+          "source": "trending",
+          "norm": 0.7708,
+          "weight": 0.4,
+          "contribution": 30.83
+        },
+        "scale": {
+          "value": 15380,
+          "norm": 0.7898,
+          "weight": 0.2,
+          "contribution": 15.8
+        },
+        "rank": {
+          "value": 2,
+          "norm": 0.96,
+          "weight": 0.15,
+          "contribution": 14.4
+        },
+        "freshness": {
+          "days_since_first_seen": 2,
+          "norm": 0.6,
+          "weight": 0.15,
+          "contribution": 9.0
+        },
+        "source": {
+          "value": [
+            "daily",
+            "lang:go"
+          ],
+          "weight": 0.1,
+          "norm": 1.0,
+          "contribution": 10.0
+        }
+      },
+      "adjusted_score": 66.03,
+      "penalties": {
+        "group": 14.0
+      },
+      "sources": [
+        "daily",
+        "lang:go"
+      ],
+      "source_ranks": {
+        "daily": 15,
+        "lang:go": 2
+      },
+      "best_rank": 2,
+      "first_seen": "2026-09-17",
+      "days_since_first_seen": 2,
+      "trending_streak_days": 2,
+      "recently_reported": false,
+      "injection_suspected": false,
+      "tags": [
+        "今日最值得关注"
+      ],
+      "ai": {
+        "summary": "开发者安全环境",
+        "what_it_is": "为开发者及其 AI 代理提供安全、远程的开发环境。",
+        "why_worth_attention": "今日发布新版本，强化代理与开发环境集成。",
+        "use_case": "远程开发、多代理协作开发。",
+        "target_user": "DevOps 工程师。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    },
+    {
+      "rank": 10,
+      "full_name": "rustfs/rustfs",
+      "url": "https://github.com/rustfs/rustfs",
+      "description": "RustFS is an open-source, S3-compatible high-performance object storage system supporting migration and coexistence with other S3-compatible platforms such as MinIO and Ceph.",
+      "stars": 33249,
+      "stars_today": 267,
+      "stars_this_week": null,
+      "stars_today_source": "trending",
+      "velocity_value": 267.0,
+      "forks": 1487,
+      "language": "Rust",
+      "topics": [
+        "ai-native",
+        "ai-storage",
+        "amazon-s3",
+        "bigdata",
+        "cloud-native",
+        "filesystem",
+        "minio",
+        "multi-cloud",
+        "object-storage",
+        "objectstorage",
+        "rust",
+        "s3"
+      ],
+      "created_at": "2023-11-23T13:45:10Z",
+      "pushed_at": "2026-09-19T06:08:05Z",
+      "license": "Apache-2.0",
+      "archived": false,
+      "open_issues": 27,
+      "has_manifest": true,
+      "manifests_found": [
+        "Cargo.toml",
+        "Dockerfile",
+        "Makefile"
+      ],
+      "has_release": true,
+      "latest_release_at": "2026-09-18T16:16:43Z",
+      "markup_ratio": 0.0,
+      "group": "systems",
+      "category": "systems-lang",
+      "software_score": 0.75,
+      "software_status": "keep",
+      "trend_score": 75.39,
+      "score_breakdown": {
+        "velocity": {
+          "value": 267.0,
+          "source": "trending",
+          "norm": 0.6983,
+          "weight": 0.4,
+          "contribution": 27.93
+        },
+        "scale": {
+          "value": 33249,
+          "norm": 0.853,
+          "weight": 0.2,
+          "contribution": 17.06
+        },
+        "rank": {
+          "value": 2,
+          "norm": 0.96,
+          "weight": 0.15,
+          "contribution": 14.4
+        },
+        "freshness": {
+          "days_since_first_seen": 4,
+          "norm": 0.4,
+          "weight": 0.15,
+          "contribution": 6.0
+        },
+        "source": {
+          "value": [
+            "daily",
+            "lang:rust"
+          ],
+          "weight": 0.1,
+          "norm": 1.0,
+          "contribution": 10.0
+        }
+      },
+      "adjusted_score": 63.39,
+      "penalties": {
+        "repeat": 12.0
+      },
+      "sources": [
+        "daily",
+        "lang:rust"
+      ],
+      "source_ranks": {
+        "daily": 13,
+        "lang:rust": 2
+      },
+      "best_rank": 2,
+      "first_seen": "2026-09-15",
+      "days_since_first_seen": 4,
+      "trending_streak_days": 4,
+      "recently_reported": true,
+      "injection_suspected": false,
+      "tags": [
+        "今日最实用"
+      ],
+      "ai": {
+        "summary": "高性能 S3 兼容存储",
+        "what_it_is": "基于 Rust 的高性能对象存储系统，兼容 S3 协议。",
+        "why_worth_attention": "连续多日上榜，强调 AI 原生与高性能。",
+        "use_case": "构建兼容 S3 的对象存储服务。",
+        "target_user": "云原生架构师。",
+        "why_is_speculation": true
+      },
+      "errors": []
+    }
+  ],
+  "candidates": [
+    {
+      "full_name": "cloudflare/security-audit-skill",
+      "stars": 14384,
+      "stars_today": 3006,
+      "stars_this_week": null,
+      "forks": 773,
+      "language": "JavaScript",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 1,
+      "sources": [
+        "daily",
+        "lang:javascript"
+      ],
+      "reasons": [
+        "弱信号命中 2 个（阈值 2）: 名称含「skill」; 描述含「skill」"
+      ]
+    },
+    {
+      "full_name": "anthropics/claude-code",
+      "stars": 146426,
+      "stars_today": 444,
+      "stars_this_week": 1620,
+      "forks": 23821,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "gray",
+      "software_score": 0.35,
+      "trend_score": 83.95,
+      "best_rank": 1,
+      "sources": [
+        "daily",
+        "lang:typescript",
+        "weekly"
+      ],
+      "reasons": [
+        "software_score 0.35 落在灰区（0.30-0.45）"
+      ]
+    },
+    {
+      "full_name": "alibaba/open-code-review",
+      "stars": 36961,
+      "stars_today": 2704,
+      "stars_this_week": 14144,
+      "forks": 2636,
+      "language": "Go",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 87.71,
+      "best_rank": 1,
+      "sources": [
+        "daily",
+        "lang:go",
+        "weekly"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10"
+      ]
+    },
+    {
+      "full_name": "TencentCloud/Octop",
+      "stars": 4050,
+      "stars_today": 569,
+      "stars_this_week": null,
+      "forks": 419,
+      "language": "Python",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 79.31,
+      "best_rank": 1,
+      "sources": [
+        "daily",
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "ankitects/anki",
+      "stars": 31266,
+      "stars_today": 174,
+      "stars_this_week": null,
+      "forks": 3239,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "keep",
+      "software_score": 0.65,
+      "trend_score": 76.76,
+      "best_rank": 1,
+      "sources": [
+        "daily",
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "NationalSecurityAgency/ghidra",
+      "stars": 78955,
+      "stars_today": 572,
+      "stars_this_week": null,
+      "forks": 8731,
+      "language": "Java",
+      "group": "security",
+      "category": "security",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 79.7,
+      "best_rank": 1,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "affaan-m/ECC",
+      "stars": 262285,
+      "stars_today": 958,
+      "stars_this_week": 5877,
+      "forks": 39234,
+      "language": "JavaScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 84.7,
+      "best_rank": 2,
+      "sources": [
+        "daily",
+        "lang:javascript",
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "Tencent/BrowserSkill",
+      "stars": 5486,
+      "stars_today": 1306,
+      "stars_this_week": null,
+      "forks": 379,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 89.36,
+      "best_rank": 2,
+      "sources": [
+        "daily",
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "anthropics/knowledge-work-plugins",
+      "stars": 24945,
+      "stars_today": 299,
+      "stars_this_week": 776,
+      "forks": 2975,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "gray",
+      "software_score": 0.3,
+      "trend_score": 78.48,
+      "best_rank": 2,
+      "sources": [
+        "daily",
+        "lang:python",
+        "weekly"
+      ],
+      "reasons": [
+        "software_score 0.30 落在灰区（0.30-0.45）"
+      ]
+    },
+    {
+      "full_name": "rustfs/rustfs",
+      "stars": 33249,
+      "stars_today": 267,
+      "stars_this_week": null,
+      "forks": 1487,
+      "language": "Rust",
+      "group": "systems",
+      "category": "systems-lang",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 75.39,
+      "best_rank": 2,
+      "sources": [
+        "daily",
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "coder/coder",
+      "stars": 15380,
+      "stars_today": 478,
+      "stars_this_week": null,
+      "forks": 1508,
+      "language": "Go",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 80.03,
+      "best_rank": 2,
+      "sources": [
+        "daily",
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "ayghri/i-have-adhd",
+      "stars": 48284,
+      "stars_today": null,
+      "stars_this_week": 7869,
+      "forks": 2808,
+      "language": "Python",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 2,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": [
+        "弱信号合计 3 个: 描述含「skill」; topics 含「claude-code-plugin」; topics 含「claude-skills」"
+      ]
+    },
+    {
+      "full_name": "keycloak/keycloak",
+      "stars": 36863,
+      "stars_today": 25,
+      "stars_this_week": null,
+      "forks": 8942,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 62.41,
+      "best_rank": 2,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "addyosmani/agent-skills",
+      "stars": 96549,
+      "stars_today": 675,
+      "stars_this_week": 3051,
+      "forks": 10203,
+      "language": "JavaScript",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 3,
+      "sources": [
+        "daily",
+        "lang:javascript",
+        "weekly"
+      ],
+      "reasons": [
+        "弱信号命中 2 个（阈值 2）: 名称含「skills」; 描述含「skills」"
+      ]
+    },
+    {
+      "full_name": "Fission-AI/OpenSpec",
+      "stars": 69467,
+      "stars_today": 296,
+      "stars_this_week": null,
+      "forks": 4760,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-app",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 85.51,
+      "best_rank": 3,
+      "sources": [
+        "daily",
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "asciimoo/hister",
+      "stars": 5032,
+      "stars_today": 889,
+      "stars_this_week": null,
+      "forks": 211,
+      "language": "Go",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 86.69,
+      "best_rank": 3,
+      "sources": [
+        "daily",
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "bilawalsidhu/gods-eye-view",
+      "stars": 38024,
+      "stars_today": null,
+      "stars_this_week": 11683,
+      "forks": 7668,
+      "language": "JavaScript",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.65,
+      "trend_score": 77.05,
+      "best_rank": 3,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "jinchenma94/bazi-skill",
+      "stars": 3113,
+      "stars_today": 13,
+      "stars_this_week": null,
+      "forks": 488,
+      "language": "Python",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.15,
+      "trend_score": 0.0,
+      "best_rank": 3,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10",
+        "software_score 0.15 < 0.30"
+      ]
+    },
+    {
+      "full_name": "NVIDIA/OpenShell",
+      "stars": 8702,
+      "stars_today": 37,
+      "stars_this_week": null,
+      "forks": 1264,
+      "language": "Rust",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 70.34,
+      "best_rank": 3,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "apache/doris",
+      "stars": 15964,
+      "stars_today": 18,
+      "stars_this_week": null,
+      "forks": 3952,
+      "language": "Java",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.7,
+      "trend_score": 58.87,
+      "best_rank": 3,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "supermemoryai/supermemory",
+      "stars": 30412,
+      "stars_today": 140,
+      "stars_this_week": null,
+      "forks": 2648,
+      "language": "TypeScript",
+      "group": "data",
+      "category": "database",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 79.84,
+      "best_rank": 4,
+      "sources": [
+        "daily",
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "tradesdontlie/tradingview-mcp",
+      "stars": 6527,
+      "stars_today": 79,
+      "stars_this_week": null,
+      "forks": 2719,
+      "language": "JavaScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "gray",
+      "software_score": 0.45,
+      "trend_score": 65.48,
+      "best_rank": 4,
+      "sources": [
+        "daily",
+        "lang:javascript"
+      ],
+      "reasons": [
+        "software_score 0.45 落在灰区（0.30-0.45）"
+      ]
+    },
+    {
+      "full_name": "Tencent/WeKnora",
+      "stars": 27119,
+      "stars_today": 858,
+      "stars_this_week": 4703,
+      "forks": 3650,
+      "language": "Go",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 78.18,
+      "best_rank": 4,
+      "sources": [
+        "lang:go",
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "bobeff/open-source-games",
+      "stars": 15163,
+      "stars_today": 339,
+      "stars_this_week": null,
+      "forks": 1260,
+      "language": "Python",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 4,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": [
+        "描述命中强排除规则: (?i)^\\s*(a\\s+|the\\s+)?(curated\\s+)?(list|collection)\\s+of\\b"
+      ]
+    },
+    {
+      "full_name": "vercel-labs/agent-browser",
+      "stars": 42853,
+      "stars_today": 79,
+      "stars_this_week": null,
+      "forks": 2873,
+      "language": "Rust",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 76.07,
+      "best_rank": 4,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "spring-projects/spring-boot",
+      "stars": 81472,
+      "stars_today": 12,
+      "stars_this_week": null,
+      "forks": 42653,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "framework",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 62.04,
+      "best_rank": 4,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "supabase/supabase",
+      "stars": 110221,
+      "stars_today": 120,
+      "stars_this_week": null,
+      "forks": 14329,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "llm-infra",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 74.58,
+      "best_rank": 5,
+      "sources": [
+        "daily",
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "NVIDIA/SkillSpector",
+      "stars": 17791,
+      "stars_today": 142,
+      "stars_this_week": null,
+      "forks": 1528,
+      "language": "Python",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 5,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": [
+        "弱信号命中 2 个（阈值 2）: 描述含「skills」; 描述含「prompt」"
+      ]
+    },
+    {
+      "full_name": "WorldFlowAI/everything-claude-code",
+      "stars": 3234,
+      "stars_today": 89,
+      "stars_this_week": null,
+      "forks": 506,
+      "language": "JavaScript",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.05,
+      "trend_score": 0.0,
+      "best_rank": 5,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10",
+        "software_score 0.05 < 0.30"
+      ]
+    },
+    {
+      "full_name": "cilium/cilium",
+      "stars": 25350,
+      "stars_today": 153,
+      "stars_this_week": null,
+      "forks": 4082,
+      "language": "Go",
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 71.88,
+      "best_rank": 5,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "NVlabs/cuda-oxide",
+      "stars": 3507,
+      "stars_today": 50,
+      "stars_this_week": null,
+      "forks": 273,
+      "language": "Rust",
+      "group": "ai",
+      "category": "llm-infra",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 60.12,
+      "best_rank": 5,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "booklore-app/booklore",
+      "stars": 1222,
+      "stars_today": 13,
+      "stars_this_week": null,
+      "forks": 88,
+      "language": "Java",
+      "group": "web",
+      "category": "web-frontend",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 60.93,
+      "best_rank": 5,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "ahmedkhaleel2004/gitdiagram",
+      "stars": 16546,
+      "stars_today": 152,
+      "stars_this_week": null,
+      "forks": 1261,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-app",
+      "software_status": "keep",
+      "software_score": 0.85,
+      "trend_score": 78.05,
+      "best_rank": 6,
+      "sources": [
+        "daily",
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "fastino-ai/GLiNER2",
+      "stars": 1966,
+      "stars_today": 35,
+      "stars_this_week": null,
+      "forks": 180,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "framework",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 65.83,
+      "best_rank": 6,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "JoeanAmier/TikTokDownloader",
+      "stars": 16111,
+      "stars_today": 58,
+      "stars_this_week": null,
+      "forks": 2749,
+      "language": "JavaScript",
+      "group": "data",
+      "category": "database",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 65.74,
+      "best_rank": 6,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "felinics/Memoh",
+      "stars": 2504,
+      "stars_today": 19,
+      "stars_this_week": null,
+      "forks": 237,
+      "language": "Go",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 63.29,
+      "best_rank": 6,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "yyjeqhc/webcodex",
+      "stars": 1360,
+      "stars_today": 202,
+      "stars_this_week": null,
+      "forks": 170,
+      "language": "Rust",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 64.87,
+      "best_rank": 6,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "GeyserMC/Geyser",
+      "stars": 5800,
+      "stars_today": 3,
+      "stars_this_week": null,
+      "forks": 887,
+      "language": "Java",
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_status": "keep",
+      "software_score": 0.85,
+      "trend_score": 56.62,
+      "best_rank": 6,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "mksglu/context-mode",
+      "stars": 23580,
+      "stars_today": null,
+      "stars_this_week": 1398,
+      "forks": 1700,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.55,
+      "trend_score": 65.73,
+      "best_rank": 7,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10"
+      ]
+    },
+    {
+      "full_name": "shiyu-coder/Kronos",
+      "stars": 39216,
+      "stars_today": 230,
+      "stars_this_week": null,
+      "forks": 6531,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.55,
+      "trend_score": 79.42,
+      "best_rank": 7,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "cline/cline",
+      "stars": 68721,
+      "stars_today": 242,
+      "stars_this_week": null,
+      "forks": 7428,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 74.59,
+      "best_rank": 7,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "louislam/uptime-kuma",
+      "stars": 91546,
+      "stars_today": 61,
+      "stars_this_week": null,
+      "forks": 8438,
+      "language": "JavaScript",
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 74.24,
+      "best_rank": 7,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "JuliusBrussee/caveman",
+      "stars": 106646,
+      "stars_today": 376,
+      "stars_this_week": null,
+      "forks": 6179,
+      "language": "Go",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 7,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": [
+        "弱信号合计 2 个: 描述含「skill」; topics 含「prompt-engineering」"
+      ]
+    },
+    {
+      "full_name": "iii-hq/iii",
+      "stars": 18791,
+      "stars_today": 28,
+      "stars_this_week": null,
+      "forks": 1265,
+      "language": "Rust",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 67.85,
+      "best_rank": 7,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "krahets/hello-algo",
+      "stars": 130271,
+      "stars_today": 45,
+      "stars_this_week": null,
+      "forks": 15519,
+      "language": "Java",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 7,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": [
+        "topics 命中排除列表: book"
+      ]
+    },
+    {
+      "full_name": "unslothai/unsloth",
+      "stars": 76405,
+      "stars_today": 82,
+      "stars_this_week": null,
+      "forks": 6974,
+      "language": "Python",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 74.8,
+      "best_rank": 8,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "rowboatlabs/rowboat",
+      "stars": 17904,
+      "stars_today": 57,
+      "stars_this_week": null,
+      "forks": 1784,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.7,
+      "trend_score": 70.63,
+      "best_rank": 8,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "microsoft/power-platform-skills",
+      "stars": 895,
+      "stars_today": 11,
+      "stars_this_week": null,
+      "forks": 182,
+      "language": "JavaScript",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 8,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": [
+        "弱信号命中 2 个（阈值 2）: 名称含「skills」; 描述含「skills」"
+      ]
+    },
+    {
+      "full_name": "weave-os/router",
+      "stars": 4478,
+      "stars_today": 26,
+      "stars_this_week": null,
+      "forks": 124,
+      "language": "Go",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.55,
+      "trend_score": 64.54,
+      "best_rank": 8,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10"
+      ]
+    },
+    {
+      "full_name": "cloudflare/quiche",
+      "stars": 11850,
+      "stars_today": 5,
+      "stars_this_week": null,
+      "forks": 1097,
+      "language": "Rust",
+      "group": "systems",
+      "category": "systems-lang",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 58.62,
+      "best_rank": 8,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "logisim-evolution/logisim-evolution",
+      "stars": 7600,
+      "stars_today": 11,
+      "stars_this_week": null,
+      "forks": 1010,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 55.36,
+      "best_rank": 8,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "max-sixty/worktrunk",
+      "stars": 8050,
+      "stars_today": null,
+      "stars_this_week": 1104,
+      "forks": 275,
+      "language": "Rust",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 60.36,
+      "best_rank": 9,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "pjialin/py12306",
+      "stars": 14948,
+      "stars_today": 8,
+      "stars_this_week": null,
+      "forks": 3573,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 60.43,
+      "best_rank": 9,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "NanmiCoder/cc-haha",
+      "stars": 14632,
+      "stars_today": 33,
+      "stars_this_week": null,
+      "forks": 8570,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 67.03,
+      "best_rank": 9,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10"
+      ]
+    },
+    {
+      "full_name": "advplyr/audiobookshelf",
+      "stars": 14378,
+      "stars_today": 13,
+      "stars_this_week": null,
+      "forks": 1171,
+      "language": "JavaScript",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 62.57,
+      "best_rank": 9,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "junegunn/fzf",
+      "stars": 83121,
+      "stars_today": 57,
+      "stars_this_week": null,
+      "forks": 3147,
+      "language": "Go",
+      "group": "dev-tools",
+      "category": "cli",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 72.55,
+      "best_rank": 9,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "yynxxxxx/Codex-X",
+      "stars": 3303,
+      "stars_today": 64,
+      "stars_this_week": null,
+      "forks": 438,
+      "language": "Rust",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 67.83,
+      "best_rank": 9,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "neo4j/neo4j",
+      "stars": 17244,
+      "stars_today": 6,
+      "stars_this_week": null,
+      "forks": 2703,
+      "language": "Java",
+      "group": "data",
+      "category": "database",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 59.41,
+      "best_rank": 9,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "tirth8205/code-review-graph",
+      "stars": 31599,
+      "stars_today": 45,
+      "stars_this_week": null,
+      "forks": 2872,
+      "language": "Python",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 69.2,
+      "best_rank": 10,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "every-app/open-seo",
+      "stars": 19372,
+      "stars_today": 189,
+      "stars_this_week": null,
+      "forks": 2490,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 66.49,
+      "best_rank": 10,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "laoma2053/awesome-zhuiju-free",
+      "stars": 8907,
+      "stars_today": 158,
+      "stars_this_week": null,
+      "forks": 564,
+      "language": "JavaScript",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 10,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": [
+        "名称命中强排除规则: (?i)^awesome[-_].+"
+      ]
+    },
+    {
+      "full_name": "microsoft/TypeScript",
+      "stars": 111110,
+      "stars_today": 28,
+      "stars_this_week": null,
+      "forks": 14328,
+      "language": "Go",
+      "group": "systems",
+      "category": "systems-lang",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 68.96,
+      "best_rank": 10,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "makepad/makepad",
+      "stars": 6991,
+      "stars_today": 55,
+      "stars_this_week": null,
+      "forks": 385,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "framework",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 67.71,
+      "best_rank": 10,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "OpenAPITools/openapi-generator",
+      "stars": 26753,
+      "stars_today": 6,
+      "stars_this_week": null,
+      "forks": 7678,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 59.53,
+      "best_rank": 10,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "openai/plugins",
+      "stars": 6989,
+      "stars_today": null,
+      "stars_this_week": 542,
+      "forks": 904,
+      "language": "JavaScript",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.2,
+      "trend_score": 0.0,
+      "best_rank": 11,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": [
+        "software_score 0.20 < 0.30"
+      ]
+    },
+    {
+      "full_name": "D4Vinci/Scrapling",
+      "stars": 82245,
+      "stars_today": 335,
+      "stars_this_week": null,
+      "forks": 8379,
+      "language": "Python",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 71.11,
+      "best_rank": 11,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "backnotprop/plannotator",
+      "stars": 8797,
+      "stars_today": 39,
+      "stars_this_week": null,
+      "forks": 661,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 65.81,
+      "best_rank": 11,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10"
+      ]
+    },
+    {
+      "full_name": "jarrodwatts/claude-hud",
+      "stars": 28049,
+      "stars_today": 43,
+      "stars_this_week": null,
+      "forks": 1303,
+      "language": "JavaScript",
+      "group": "dev-tools",
+      "category": "cli",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 62.19,
+      "best_rank": 11,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "multica-ai/multica",
+      "stars": 50441,
+      "stars_today": 138,
+      "stars_this_week": null,
+      "forks": 6539,
+      "language": "Go",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.65,
+      "trend_score": 74.89,
+      "best_rank": 11,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "lancedb/lancedb",
+      "stars": 11465,
+      "stars_today": 10,
+      "stars_this_week": null,
+      "forks": 1057,
+      "language": "Rust",
+      "group": "ai",
+      "category": "llm-infra",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 59.79,
+      "best_rank": 11,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "apache/fineract",
+      "stars": 2493,
+      "stars_today": 8,
+      "stars_this_week": null,
+      "forks": 2785,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 56.29,
+      "best_rank": 11,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "blader/humanizer",
+      "stars": 50012,
+      "stars_today": null,
+      "stars_this_week": 3118,
+      "forks": 4038,
+      "language": "Python",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 12,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": [
+        "弱信号合计 3 个: 描述含「skill」; topics 含「agent-skills」; topics 含「prompt-engineering」"
+      ]
+    },
+    {
+      "full_name": "roboflow/supervision",
+      "stars": 50928,
+      "stars_today": 195,
+      "stars_this_week": null,
+      "forks": 4840,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 70.03,
+      "best_rank": 12,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "tashfeenahmed/freellmapi",
+      "stars": 27240,
+      "stars_today": 264,
+      "stars_this_week": null,
+      "forks": 3718,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "llm-infra",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 67.51,
+      "best_rank": 12,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "fleetbase/fleetbase",
+      "stars": 3724,
+      "stars_today": 92,
+      "stars_this_week": null,
+      "forks": 1010,
+      "language": "JavaScript",
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_status": "keep",
+      "software_score": 0.7,
+      "trend_score": 59.02,
+      "best_rank": 12,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "kubernetes-sigs/kueue",
+      "stars": 2986,
+      "stars_today": 3,
+      "stars_this_week": null,
+      "forks": 803,
+      "language": "Go",
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 51.94,
+      "best_rank": 12,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "BurntSushi/ripgrep",
+      "stars": 68425,
+      "stars_today": 51,
+      "stars_this_week": null,
+      "forks": 3096,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "cli",
+      "software_status": "keep",
+      "software_score": 0.95,
+      "trend_score": 69.88,
+      "best_rank": 12,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "rstudio/rstudio",
+      "stars": 5070,
+      "stars_today": 0,
+      "stars_this_week": null,
+      "forks": 1200,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.5,
+      "trend_score": 45.88,
+      "best_rank": 12,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "kunchenguid/firstmate",
+      "stars": 6592,
+      "stars_today": null,
+      "stars_this_week": 990,
+      "forks": 2008,
+      "language": "Shell",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "gray",
+      "software_score": 0.3,
+      "trend_score": 59.97,
+      "best_rank": 13,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": [
+        "software_score 0.30 落在灰区（0.30-0.45）"
+      ]
+    },
+    {
+      "full_name": "stablyai/orca",
+      "stars": 72142,
+      "stars_today": 831,
+      "stars_this_week": 5272,
+      "forks": 4722,
+      "language": "TypeScript",
+      "group": "dev-tools",
+      "category": "cli",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 83.22,
+      "best_rank": 13,
+      "sources": [
+        "lang:typescript",
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "microsoft/agent-lightning",
+      "stars": 18352,
+      "stars_today": 54,
+      "stars_this_week": null,
+      "forks": 1618,
+      "language": "Python",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 67.41,
+      "best_rank": 13,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "prettier/prettier",
+      "stars": 52279,
+      "stars_today": 37,
+      "stars_this_week": null,
+      "forks": 5004,
+      "language": "JavaScript",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 58.27,
+      "best_rank": 13,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "alibaba/skill-up",
+      "stars": 970,
+      "stars_today": 10,
+      "stars_this_week": null,
+      "forks": 75,
+      "language": "Go",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 13,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": [
+        "弱信号合计 3 个: 名称含「skill」; topics 含「agent-skills」; topics 含「skills」"
+      ]
+    },
+    {
+      "full_name": "l0ng-ai/tty7",
+      "stars": 1013,
+      "stars_today": 16,
+      "stars_this_week": null,
+      "forks": 76,
+      "language": "Rust",
+      "group": "ai",
+      "category": "ai-coding",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 56.79,
+      "best_rank": 13,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "648540858/wvp-GB28181-pro",
+      "stars": 7329,
+      "stars_today": 2,
+      "stars_this_week": null,
+      "forks": 2102,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 51.37,
+      "best_rank": 13,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "microsoft/markitdown",
+      "stars": 185481,
+      "stars_today": null,
+      "stars_this_week": 2841,
+      "forks": 13655,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 67.76,
+      "best_rank": 14,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "Graphify-Labs/graphify",
+      "stars": 119449,
+      "stars_today": 387,
+      "stars_this_week": null,
+      "forks": 11547,
+      "language": "Python",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 14,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": [
+        "弱信号合计 2 个: 描述含「skill」; topics 含「skills」"
+      ]
+    },
+    {
+      "full_name": "n8n-io/n8n",
+      "stars": 205320,
+      "stars_today": 558,
+      "stars_this_week": null,
+      "forks": 60783,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 76.3,
+      "best_rank": 14,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "juliangarnier/anime",
+      "stars": 72907,
+      "stars_today": 29,
+      "stars_this_week": null,
+      "forks": 4928,
+      "language": "JavaScript",
+      "group": "web",
+      "category": "web-frontend",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 66.04,
+      "best_rank": 14,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "fleetdm/fleet",
+      "stars": 6885,
+      "stars_today": 10,
+      "stars_this_week": null,
+      "forks": 1024,
+      "language": "Go",
+      "group": "security",
+      "category": "security",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 57.16,
+      "best_rank": 14,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "remorses/gpuix",
+      "stars": 2003,
+      "stars_today": 45,
+      "stars_this_week": null,
+      "forks": 62,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 62.28,
+      "best_rank": 14,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "halo-dev/halo",
+      "stars": 39818,
+      "stars_today": 22,
+      "stars_this_week": null,
+      "forks": 10330,
+      "language": "Java",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 14,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": [
+        "topics 命中排除列表: blog"
+      ]
+    },
+    {
+      "full_name": "home-assistant/core",
+      "stars": 90754,
+      "stars_today": null,
+      "stars_this_week": 357,
+      "forks": 38700,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 62.31,
+      "best_rank": 15,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "getsentry/sentry",
+      "stars": 44801,
+      "stars_today": 8,
+      "stars_this_week": null,
+      "forks": 4856,
+      "language": "Python",
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_status": "keep",
+      "software_score": 0.9,
+      "trend_score": 58.63,
+      "best_rank": 15,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "lfnovo/open-notebook",
+      "stars": 39156,
+      "stars_today": 62,
+      "stars_this_week": null,
+      "forks": 4538,
+      "language": "TypeScript",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.65,
+      "trend_score": 68.13,
+      "best_rank": 15,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10"
+      ]
+    },
+    {
+      "full_name": "WebKit/WebKit",
+      "stars": 10163,
+      "stars_today": 27,
+      "stars_this_week": null,
+      "forks": 2185,
+      "language": "JavaScript",
+      "group": "web",
+      "category": "web-frontend",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 61.86,
+      "best_rank": 15,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "router-for-me/CLIProxyAPI",
+      "stars": 52449,
+      "stars_today": 133,
+      "stars_this_week": null,
+      "forks": 7918,
+      "language": "Go",
+      "group": "dev-tools",
+      "category": "cli",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 72.38,
+      "best_rank": 15,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "alphaXiv/OpenResearch",
+      "stars": 5324,
+      "stars_today": 541,
+      "stars_this_week": null,
+      "forks": 325,
+      "language": "Rust",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 66.61,
+      "best_rank": 15,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "apache/iceberg",
+      "stars": 9251,
+      "stars_today": 4,
+      "stars_this_week": null,
+      "forks": 3536,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 44.1,
+      "best_rank": 15,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "PaddlePaddle/PaddleOCR",
+      "stars": 89805,
+      "stars_today": 71,
+      "stars_this_week": null,
+      "forks": 11364,
+      "language": "Python",
+      "group": "ai",
+      "category": "llm-infra",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 69.55,
+      "best_rank": 16,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "jamiepine/voicebox",
+      "stars": 55131,
+      "stars_today": 416,
+      "stars_this_week": null,
+      "forks": 6868,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-app",
+      "software_status": "keep",
+      "software_score": 0.95,
+      "trend_score": 71.53,
+      "best_rank": 16,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "h5bp/html5-boilerplate",
+      "stars": 57630,
+      "stars_today": 3,
+      "stars_this_week": null,
+      "forks": 12254,
+      "language": "JavaScript",
+      "group": "web",
+      "category": "web-frontend",
+      "software_status": "keep",
+      "software_score": 0.65,
+      "trend_score": 45.39,
+      "best_rank": 16,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": [
+        "弱信号 1 个，扣 0.10"
+      ]
+    },
+    {
+      "full_name": "mikefarah/yq",
+      "stars": 15975,
+      "stars_today": 4,
+      "stars_this_week": null,
+      "forks": 1124,
+      "language": "Go",
+      "group": "dev-tools",
+      "category": "cli",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 53.4,
+      "best_rank": 16,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "EpicGames/lore",
+      "stars": 8665,
+      "stars_today": 19,
+      "stars_this_week": null,
+      "forks": 432,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 59.32,
+      "best_rank": 16,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "ViaVersion/ViaVersion",
+      "stars": 1634,
+      "stars_today": 1,
+      "stars_this_week": null,
+      "forks": 347,
+      "language": "Java",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 16,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": [
+        "topics 命中排除列表: paper"
+      ]
+    },
+    {
+      "full_name": "heygen-com/hyperframes",
+      "stars": 51480,
+      "stars_today": 333,
+      "stars_this_week": 2401,
+      "forks": 4688,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 66.71,
+      "best_rank": 17,
+      "sources": [
+        "lang:typescript",
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "marin-community/marin",
+      "stars": 3750,
+      "stars_today": 17,
+      "stars_this_week": null,
+      "forks": 300,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "framework",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 56.82,
+      "best_rank": 17,
+      "sources": [
+        "lang:python"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "huggingface/transformers.js",
+      "stars": 16303,
+      "stars_today": 3,
+      "stars_this_week": null,
+      "forks": 1192,
+      "language": "JavaScript",
+      "group": "dev-tools",
+      "category": "framework",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 51.72,
+      "best_rank": 17,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "kunchenguid/no-mistakes",
+      "stars": 8557,
+      "stars_today": 22,
+      "stars_this_week": null,
+      "forks": 886,
+      "language": "Go",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 59.4,
+      "best_rank": 17,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "bevyengine/bevy",
+      "stars": 48272,
+      "stars_today": 49,
+      "stars_this_week": null,
+      "forks": 4848,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 66.11,
+      "best_rank": 17,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "nageoffer/ragent",
+      "stars": 4061,
+      "stars_today": 12,
+      "stars_this_week": null,
+      "forks": 826,
+      "language": "Java",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 55.33,
+      "best_rank": 17,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "Panniantong/Agent-Reach",
+      "stars": 83210,
+      "stars_today": null,
+      "stars_this_week": 3766,
+      "forks": 7289,
+      "language": "Python",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 64.84,
+      "best_rank": 18,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "yikart/AiToEarn",
+      "stars": 26067,
+      "stars_today": 50,
+      "stars_this_week": null,
+      "forks": 4214,
+      "language": "TypeScript",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.7,
+      "trend_score": 64.6,
+      "best_rank": 18,
+      "sources": [
+        "lang:typescript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "decolua/9router",
+      "stars": 29312,
+      "stars_today": 154,
+      "stars_this_week": null,
+      "forks": 5434,
+      "language": "JavaScript",
+      "group": "ai",
+      "category": "ai-coding",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 64.35,
+      "best_rank": 18,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "github/gh-aw",
+      "stars": 5151,
+      "stars_today": 3,
+      "stars_this_week": null,
+      "forks": 545,
+      "language": "Go",
+      "group": "ai",
+      "category": "ai-coding",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 49.23,
+      "best_rank": 18,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "lbjlaq/Antigravity-Manager",
+      "stars": 31512,
+      "stars_today": 56,
+      "stars_this_week": null,
+      "forks": 3391,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "cli",
+      "software_status": "keep",
+      "software_score": 0.65,
+      "trend_score": 65.47,
+      "best_rank": 18,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "trinodb/trino",
+      "stars": 13254,
+      "stars_today": 8,
+      "stars_this_week": null,
+      "forks": 3779,
+      "language": "Java",
+      "group": "data",
+      "category": "database",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 48.83,
+      "best_rank": 18,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "obra/superpowers",
+      "stars": 288608,
+      "stars_today": null,
+      "stars_this_week": 3573,
+      "forks": 25815,
+      "language": "Shell",
+      "group": "other",
+      "category": "other",
+      "software_status": "drop",
+      "software_score": 0.0,
+      "trend_score": 0.0,
+      "best_rank": 19,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": [
+        "弱信号合计 2 个: 描述含「skills」; topics 含「skills」"
+      ]
+    },
+    {
+      "full_name": "hmjz100/LinkSwift",
+      "stars": 20580,
+      "stars_today": 27,
+      "stars_this_week": null,
+      "forks": 1243,
+      "language": "JavaScript",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 60.62,
+      "best_rank": 19,
+      "sources": [
+        "lang:javascript"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "goharbor/harbor",
+      "stars": 29408,
+      "stars_today": 8,
+      "stars_this_week": null,
+      "forks": 5348,
+      "language": "Go",
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 49.54,
+      "best_rank": 19,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "qwq233/OhMyKeymint",
+      "stars": 364,
+      "stars_today": 6,
+      "stars_this_week": null,
+      "forks": 51,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 47.08,
+      "best_rank": 19,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "Card-Forge/forge",
+      "stars": 2710,
+      "stars_today": 5,
+      "stars_this_week": null,
+      "forks": 1091,
+      "language": "Java",
+      "group": "ai",
+      "category": "ai-app",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 40.6,
+      "best_rank": 19,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "petergyang/no-ai-slop",
+      "stars": 10606,
+      "stars_today": null,
+      "stars_this_week": 2189,
+      "forks": 732,
+      "language": "Python",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.45,
+      "trend_score": 57.56,
+      "best_rank": 20,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "Wei-Shaw/sub2api",
+      "stars": 42005,
+      "stars_today": 137,
+      "stars_this_week": null,
+      "forks": 8921,
+      "language": "Go",
+      "group": "dev-tools",
+      "category": "devtool",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 69.16,
+      "best_rank": 20,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "block/buzz",
+      "stars": 33651,
+      "stars_today": 123,
+      "stars_this_week": null,
+      "forks": 4414,
+      "language": "Rust",
+      "group": "dev-tools",
+      "category": "framework",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 62.26,
+      "best_rank": 20,
+      "sources": [
+        "lang:rust"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "elastic/elasticsearch",
+      "stars": 77933,
+      "stars_today": 10,
+      "stars_this_week": null,
+      "forks": 26075,
+      "language": "Java",
+      "group": "dev-tools",
+      "category": "library-sdk",
+      "software_status": "keep",
+      "software_score": 0.65,
+      "trend_score": 57.54,
+      "best_rank": 20,
+      "sources": [
+        "lang:java"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "danny-avila/LibreChat",
+      "stars": 44349,
+      "stars_today": null,
+      "stars_this_week": 1528,
+      "forks": 9113,
+      "language": "TypeScript",
+      "group": "ai",
+      "category": "ai-agent",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 55.84,
+      "best_rank": 21,
+      "sources": [
+        "weekly"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "guohuiyuan/go-music-dl",
+      "stars": 4384,
+      "stars_today": 23,
+      "stars_this_week": null,
+      "forks": 419,
+      "language": "Go",
+      "group": "dev-tools",
+      "category": "cli",
+      "software_status": "keep",
+      "software_score": 0.75,
+      "trend_score": 56.12,
+      "best_rank": 21,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    },
+    {
+      "full_name": "prometheus/alertmanager",
+      "stars": 8618,
+      "stars_today": 4,
+      "stars_this_week": null,
+      "forks": 2468,
+      "language": "Go",
+      "group": "infrastructure",
+      "category": "devops-cloud",
+      "software_status": "keep",
+      "software_score": 1.0,
+      "trend_score": 48.79,
+      "best_rank": 22,
+      "sources": [
+        "lang:go"
+      ],
+      "reasons": []
+    }
+  ]
+}
