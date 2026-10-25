@@ -119,8 +119,12 @@ jobs:
           fi
           git commit -m "report: ${{ steps.meta.outputs.date }}"
           if ! git push; then
-            echo "push 失败，尝试 rebase 后重试一次"
-            git pull --rebase --autostash
+            # 同一天两个运行并行时（外部 cron 与 schedule 撞车、或手动补跑），两者
+            # checkout 的是同一个 base，都会生成同名报告文件，直接 rebase 必然冲突。
+            # rebase 中的 -X theirs 指"取被应用的提交"，也就是本次运行生成的内容，
+            # 与"报告文件按日期覆盖、后写者胜"的既有语义一致。
+            echo "push 失败，尝试 rebase 后重试一次（同名报告以本次生成为准）"
+            git pull --rebase --autostash -X theirs
             git push
           fi
 
