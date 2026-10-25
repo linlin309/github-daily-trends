@@ -185,6 +185,56 @@ Actions → **daily-report** → **Run workflow**：
 
 同一天重复运行：文件名由日期唯一决定（覆盖同一个文件），**默认不会重复发邮件**（除非 `force=true`）。
 
+### 准点触发（外部 cron 调 `workflow_dispatch`）
+
+`schedule` 的 5 小时延迟无解，唯一能准点的做法是让**仓库之外**的东西到点敲一下
+`workflow_dispatch`。代码零改动——`on.workflow_dispatch` 本来就开着，
+`daily-report` 的 workflow ID 是 `356342825`（用文件名也行）。
+
+需要准备一件东西：**一个只对这个仓库有 Actions 写权限的 PAT**。
+用 fine-grained token（比 classic 安全，泄露了也只能触发这个仓库的工作流）：
+
+> GitHub → Settings → Developer settings → **Fine-grained tokens** → Generate new token
+> - Repository access：**Only select repositories** → `linlin309/github-daily-trends`
+> - Permissions → Repository permissions → **Actions: Read and write**
+> - Expiration：建议 1 年，并**在日历里记一条到期提醒**（过期后外部 cron 会静默 401，日报就只剩 `schedule` 的迟到版）
+
+先在本机验一次（`$PAT` 换成刚生成的 token）：
+
+```bash
+curl -i -X POST   -H "Accept: application/vnd.github+json"   -H "Authorization: Bearer $PAT"   -H "X-GitHub-Api-Version: 2022-11-28"   https://api.github.com/repos/linlin309/github-daily-trends/actions/workflows/daily-report.yml/dispatches   -d '{"ref":"main"}'
+```
+
+**期望 `HTTP/2 204`**（204 = 已入队，没有响应体）。返回 `401` 是 token 无效/过期，
+`403` 是权限没给到 Actions，`404` 是仓库名或 workflow 文件名写错。
+
+然后在免费外部定时服务里配一条（以 cron-job.org 为例）：
+
+| 项 | 值 |
+|---|---|
+| URL | `https://api.github.com/repos/linlin309/github-daily-trends/actions/workflows/daily-report.yml/dispatches` |
+| Method | `POST` |
+| Schedule | 每天 **10:07**，时区选 **Asia/Shanghai**（= 02:07 UTC） |
+| Headers | `Accept: application/vnd.github+json`、`Authorization: Bearer <PAT>`、`X-GitHub-Api-Version: 2022-11-28`、`Content-Type: application/json` |
+| Body | `{"ref":"main"}` |
+| 失败通知 | **建议开启**——PAT 过期、GitHub 挂掉时你需要知道 |
+
+验证（`event` 应为 `workflow_dispatch`，且 `createdAt` 是准点的 02:07 UTC 附近）：
+
+```bash
+gh run list --workflow=daily-report --limit 3   --json databaseId,event,createdAt,conclusion
+```
+
+**为什么保留 `schedule`**：外部服务挂了还有兜底。两者同一天都跑不会重复发邮件
+（幂等检查在发信前拦住），代价只是多跑一次采集、多花一次 GitHub API 配额。
+但如果外部 cron 准点跑完、`schedule` 几小时后才到，那份数据会**覆盖**当天的报告文件——
+`reports/YYYY-MM-DD.md` 的内容会变成延迟那次抓到的 trending，`git` 里也会多一条
+`report: <同一天>` 的提交。要避免这种"晚间重写"，就在外部 cron 稳定跑通几周后
+把 `daily-report.yml` 里的 `schedule:` 整段删掉。
+
+> 更在意 PAT 不落到第三方手里的话，可以用 **Cloudflare Workers Cron Triggers**
+> （免费额度足够，PAT 存在自己账号的 Worker secret 里），只是要多写十几行 Worker 代码。
+
 ### 怎么看运行结果
 
 - **Actions → daily-report → 具体一次运行**：每一步都有日志；顶部 **Summary** 里有一张"选中项目 + 热度分 + 分类"表格，以及本次的降级提示。
