@@ -127,8 +127,8 @@ python -m src.main --send-only --date 2026-09-12     # 只发邮件（读已落�
 | 名称 | 填什么 |
 |---|---|
 | `LLM_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4/`（国际站：`https://api.z.ai/api/paas/v4`） |
-| `LLM_MODEL` | `glm-4.7-flash`（**注意：`glm-4.7-flashx` 是收费的**） |
-| `LLM_MODEL_2` | 可选，**同厂商换模型兜底**（复用 `LLM_API_KEY`，无需新 Secret）。建议 `glm-4-flash-250414`：1305 是"该模型"过载，换模型往往能绕开。不配则该条 Provider 自动忽略 |
+| `LLM_MODEL` | `glm-4-flash-250414`（**主力**：实测 15 天 0 次失败。**注意：`glm-4.7-flashx` 是收费的**） |
+| `LLM_MODEL_2` | 建议 `glm-4.7-flash`，**同厂商换模型兜底**（复用 `LLM_API_KEY`，无需新 Secret）。它能力更强但平台级过载严重（实测 15 天里首试只成功 2 次、10 次被 1305 打满），所以放第二顺位。不配则该条 Provider 自动忽略 |
 | `LLM_FALLBACK_BASE_URL` | 可选，`https://openrouter.ai/api/v1` |
 | `LLM_FALLBACK_MODEL` | 可选，例如 `google/gemma-4-31b-it:free` |
 | `MAIL_SMTP_HOST` | `smtp.163.com` |
@@ -256,7 +256,7 @@ JSON 里已经为将来留好了接口：
 |---|---|---|
 | GitHub Actions | 2-5 分钟/天 | 公开仓库**免费** |
 | GitHub API | 约 500 次/天 | `GITHUB_TOKEN` 1000 次/小时，免费 |
-| LLM | 约 8k tokens/天，1 次调用 | 智谱 `glm-4.7-flash` 免费 |
+| LLM | 约 8k tokens/天，1 次调用 | 智谱 `glm-4-flash-250414` 免费 |
 | 邮件 | 1 封/天 | 免费 |
 | 存储 | 约 30KB/天 ≈ 11MB/年 | 免费 |
 | **合计** | | **≈ 0 元/月** |
@@ -271,7 +271,7 @@ JSON 里已经为将来留好了接口：
 
 ```bash
 export LLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4/
-export LLM_MODEL=glm-4.7-flash
+export LLM_MODEL=glm-4-flash-250414
 export LLM_API_KEY=...
 python scripts/check_llm.py            # 最小请求：验证鉴权 / base_url / 模型名 / 账号额度
 python scripts/check_llm.py --full     # 真实提示词 + 真实项目：测真实耗时与 token
@@ -297,14 +297,16 @@ python scripts/check_llm.py --full     # 真实提示词 + 真实项目：测真
 
 | 模型 | 状态 | 能否用于本日报 |
 |---|---|---|
-| `glm-4.7-flash` | **免费**，200K 上下文 / 128K 最大输出 | ✅ 主力（当前唯一理想的免费文本模型） |
-| `glm-4-flash-250414` | **免费**（智谱首个免费大模型 API），128K 上下文 | ⚪ 老一代、能力弱，可作同厂商兜底（配 `LLM_MODEL_2`） |
+| `glm-4-flash-250414` | **免费**（智谱首个免费大模型 API），128K 上下文 | ✅ **主力**（配 `LLM_MODEL`）：实测 15 天 0 次失败，每次 28～35s |
+| `glm-4.7-flash` | **免费**，200K 上下文 / 128K 最大输出，能力更强 | ⚪ 兜底（配 `LLM_MODEL_2`）：平台级过载，首试成功率仅 2/15 |
 | `glm-4.5-flash` | 免费但**已进入下线流程**，请求自动路由到 GLM-4.7-Flash | ❌ 换它等于换回 4.7，绕不开 1305 |
 | `glm-4.6v-flash` / `glm-4v-flash` | 免费，但是**视觉**模型 | ❌ 不适合纯文本 JSON 输出 |
 | `glm-4.7-flashx` | **收费**（$0.07 / $0.4 每百万 token） | ❌ 名字陷阱，别配错 |
 
-> 结论：**智谱内部能绕开 1305 的选项只有 `glm-4-flash-250414`**（1305 是按模型计的，换模型确实有用）；
-> 但要彻底摆脱"免费档高峰被挤"，还是得启用第三方备用 Provider。
+> 结论：**智谱内部能绕开 1305 的选项只有 `glm-4-flash-250414`**（1305 是按模型计的，换模型确实有用）。
+> 2026-10 实测：`glm-4.7-flash` 作主力时 15 天里 10 天要退到备用模型，白等两次 30s 退避；
+> 因此现在**把它降为 `LLM_MODEL_2` 兜底**，主力换成 `glm-4-flash-250414`。
+> 要彻底摆脱"免费档高峰被挤"，仍建议启用第三方备用 Provider。
 
 失败最常见的三个原因（按概率）：
 
