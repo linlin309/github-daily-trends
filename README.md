@@ -281,6 +281,7 @@ JSON 里已经为将来留好了接口：
   "selection": { "stopped_reason": "target_reached", "floor": 35.0 },
   "sources": { "ok": ["daily", "weekly", "lang:python"], "failed": [] },
   "llm": { "provider": "zhipu", "model": "glm-4.7-flash", "ok": true, "calls": 1, "tokens": {"in": 5480, "out": 2260} },
+  "email": { "ok": true, "attempted_at": "2026-09-12T12:30:06+08:00" },
   "degraded": [],
   "selected": [
     {

@@ -266,6 +266,9 @@ class ReportRenderer:
                 "failed": meta.get("sources_failed") or [],
             },
             "llm": analysis.to_dict(),
+            # 邮件发送事实由 --send-only 回写；幂等判断靠它而不是"文件是否存在"，
+            # 否则报告先生成（补跑/凌晨误触）后，当天就永远发不出邮件。
+            "email": meta.get("email") or {"ok": False, "attempted_at": None},
             "degraded": meta.get("degraded") or [],
             "summary": analysis.summary,
             "selected": [candidate.to_dict() for candidate in selected],

@@ -126,6 +126,8 @@ def test_json_payload_contract(cfg):
     assert payload["mode"] == "trending+search"
     assert payload["counts"] == {"candidates": 1, "after_filter": 12, "selected": 1, "target": 10}
     assert payload["llm"]["provider"] == "zhipu" and payload["llm"]["calls"] == 1
+    # 发信状态由 --send-only 回写；默认是"没发过"，工作流据此决定是否补发
+    assert payload["email"] == {"ok": False, "attempted_at": None}
     assert payload["summary"]["headline"]
     selected_item = payload["selected"][0]
     for key in ("full_name", "stars", "stars_today", "trend_score", "score_breakdown", "category", "ai", "tags"):

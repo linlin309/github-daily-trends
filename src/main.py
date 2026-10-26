@@ -82,7 +82,11 @@ def run(args: argparse.Namespace) -> int:
 
     reports_dir = root / cfg["paths"]["reports_dir"]
     report_md = reports_dir / cfg["paths"]["markdown_name"].format(date=date_str)
-    already_existed = report_md.is_file()
+    # 是否"今天已经发过信"看 JSON 里的发信记录，而不是文件是否存在：
+    # 报告可能被凌晨误触、手动补跑先一步生成，只看文件会导致当天永久漏发。
+    already_existed = report_md.is_file() and _email_already_sent(
+        reports_dir / cfg["paths"]["json_name"].format(date=date_str)
+    )
 
     degraded: list[str] = []
     if args.date and today != now.date():
@@ -339,6 +343,11 @@ def run(args: argparse.Namespace) -> int:
             plain_text=bundle.plain_text,
         )
         if email_result.ok:
+            # 同步发信事实，避免随后 --send-only 或次日运行重复发信
+            written["json"].write_text(
+                dump_json({**bundle.json_payload, "email": {"ok": True, "attempted_at": now.isoformat(timespec="seconds")}}),
+                encoding="utf-8",
+            )
             LOG.info("邮件发送成功（尝试 %d 次）", email_result.attempts)
         else:
             LOG.error("邮件发送失败：%s", email_result.error)
@@ -423,6 +432,13 @@ def run_send_only(args: argparse.Namespace, *, root: Path, cfg: dict) -> int:
     )
     if result.ok:
         LOG.info("邮件发送成功（尝试 %d 次）", result.attempts)
+        # 回写发信事实：幂等判断靠它，而不是"报告文件是否存在"，
+        # 否则报告先生成过（凌晨误触/补跑），当天就再也发不出邮件。
+        payload["email"] = {
+            "ok": True,
+            "attempted_at": local_now(cfg.get("timezone", "Asia/Shanghai")).isoformat(timespec="seconds"),
+        }
+        json_path.write_text(dump_json(payload), encoding="utf-8")
         _write_step_summary(
             f"## ✅ 邮件已发送\n\n- 报告：`reports/{date_str}.md`\n"
             f"- 收件人：{', '.join(cfg['mail']['to'])}\n- 项目数：{len(selected)}\n"
@@ -435,6 +451,15 @@ def run_send_only(args: argparse.Namespace, *, root: Path, cfg: dict) -> int:
 
 
 # ---------------------------------------------------------------------- 辅助
+def _email_already_sent(json_path: Path) -> bool:
+    """当天是否真的发过邮件。读不到/字段缺失一律当作"没发过"，宁可多发一次也不静默漏发。"""
+    try:
+        email = json.loads(json_path.read_text(encoding="utf-8")).get("email") or {}
+    except (OSError, ValueError):
+        return False
+    return bool(email.get("ok"))
+
+
 def _write_outputs(out_dir: Path, date_str: str, bundle, *, dry_run: bool) -> dict[str, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     written: dict[str, Path] = {}

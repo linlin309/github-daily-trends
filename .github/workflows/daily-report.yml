@@ -86,13 +86,15 @@ jobs:
           fi
           echo "报告日期：$(cat "$GITHUB_OUTPUT" | tail -1)"
 
-      - name: 幂等检查（当天是否已有报告）
+      - name: 幂等检查（当天是否已发过邮件）
         id: idem
         run: |
           set -euo pipefail
-          if [ -f "reports/${{ steps.meta.outputs.date }}.md" ]; then
+          # 判据是"邮件是否真的发成功过"（JSON 里的 email.ok），不是"报告文件是否存在"：
+          # 报告可能被凌晨误触或手动补跑先生成，只看文件会让当天永久漏发。
+          if python -c "import sys;sys.exit(0 if __import__('json').load(open('reports/${{ steps.meta.outputs.date }}.json',encoding='utf-8')).get('email',{}).get('ok') else 1)" 2>/dev/null; then
             echo "exists=1" >> "$GITHUB_OUTPUT"
-            echo "当天报告已存在：跳过后面的邮件发送（除非 force=true）"
+            echo "当天邮件已发过：跳过重复发送（除非 force=true）"
           else
             echo "exists=0" >> "$GITHUB_OUTPUT"
           fi
@@ -129,5 +131,24 @@ jobs:
           fi
 
       - name: 发送邮件（历史已提交之后才执行）
+        id: send
         if: ${{ inputs.dry_run != true && (steps.idem.outputs.exists == '0' || inputs.force == true) }}
         run: python -m src.main --send-only --date "${{ steps.meta.outputs.date }}"
+
+      # 发信成功才回写 email.ok，所以要再提交一次，否则下次运行读到旧 JSON 会重复发信。
+      - name: 记录发信状态
+        if: ${{ inputs.dry_run != true && steps.send.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports
+          if git diff --cached --quiet; then
+            echo "发信状态无变化，跳过提交"
+            exit 0
+          fi
+          git commit -m "chore: 记录 ${{ steps.meta.outputs.date }} 已发信"
+          if ! git push; then
+            git pull --rebase --autostash -X theirs
+            git push
+          fi
