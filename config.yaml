@@ -120,9 +120,12 @@ filter:
       - '(?i)\bcollection of (books|links|resources|tutorials|articles|papers|tools)\b'
       - '学习资料|学习资源|学习路线|教程合集|面试题|面试资料|资源合集|资源集合|电子书|读书笔记|笔记合集|由浅入深'
 
-  # 弱信号：单个不足以排除，需 ≥2 个同时命中
-  # 提示：想更激进地排除"技能/提示词集合"类仓库，把 skill(s)/prompt(s) 加进 strong 段即可。
+  # 弱信号：单个不足以排除，需 ≥2 个同时命中。
+  # soft_words 里的词属于"可能是软件、也可能是文档"的模糊地带（技能包/提示词集合）。
+  # 命中它们的项目不在 prefilter 淘汰，而是等 GitHub API 补全后再判定：
+  # 有依赖清单或 Release → 当软件保留；两者都没有 → 仍按弱信号淘汰。
   weak:
+    soft_words: [skill, skills, prompt, prompts, agent-skills, ai-skills, claude-skills, claude-code-plugin, claude-plugin, prompt-engineering, cursor-rules]
     name_words: [book, books, notes, note, list, lists, docs, doc, guide, guides, reference, examples, sample, samples, template, templates, boilerplate, starter, collection, resource, resources, learn, learning, study, awesome, handbook, manual, skill, skills]
     desc_words: [book, books, notes, list of, lists of, guide, guides, tutorial, tutorials, learning, study, roadmap, awesome, resources, examples, collection, handbook, cheatsheet, skill, skills, prompt, prompts]
     topics: [learning, study, guide, guides, handbook, reference, manual, template, boilerplate, starter, collection, list, curated, notes, resources, skills, claude-skills, claude-code-plugin, claude-plugin, agent-skills, ai-skills, prompts, prompt-engineering, cursor-rules]
@@ -160,10 +163,15 @@ filter:
 classify:
   fallback_category: other
   fallback_group: other
+  # 泛化 topic：几乎任何技术项目都可能带，命中它们不足以说明类别。
+  # 精确匹配时按权重打分（专指 1.0 / 泛化 generic_topic_weight），取总分最高的类别。
+  # 不加这层，一个带 docker 的 AI 代理会被判成 devops-cloud（2026-10-30 实际发生）。
+  generic_topic_weight: 0.25
+  generic_topics: [docker, container, cloud, linux, windows, macos, proxy, gateway, api, tool, tools, cli, gui, web, mobile, desktop, cross-platform, plugin, extension, framework, library, libraries, sdk, package, module, python, typescript, javascript, golang, rust, java, c, cpp, ai, llm, agent, agents, automation, productivity, tooling, resources, electron, tauri, tauri-app, electron-app, desktop-app, cross-platform-app, nodejs, bun, deno, sqlite, redis, postgres]
   categories:
     - name: ai-agent
       group: ai
-      topics: [ai-agent, agent, agents, agentic, autonomous-agents, multi-agent, llm-agent, agent-framework, mcp, mcp-server, tool-use]
+      topics: [ai-agent, ai-agents, agent, agents, agentic, agentic-ai, autonomous-agents, multi-agent, llm-agent, agent-framework, agent-skills, mcp, mcp-server, tool-use]
       keywords: [agent, agents, agentic, multi-agent, autonomous agent, mcp]
     - name: ai-coding
       group: ai
@@ -183,7 +191,7 @@ classify:
       keywords: [command line, cli, terminal, tui, shell tool]
     - name: devtool
       group: dev-tools
-      topics: [developer-tools, devtools, tooling, linter, formatter, static-analysis, testing, test, debugger, code-review, ide, editor, vscode-extension, neovim, plugin]
+      topics: [developer-tools, devtools, tooling, linter, formatter, static-analysis, testing, test, debugger, code-review, ide, editor, vscode-extension, neovim, claude-code, codex, cursor-rules]
       keywords: [developer tool, linter, formatter, static analysis, debugger, code review, plugin, extension]
     - name: framework
       group: dev-tools
@@ -211,7 +219,7 @@ classify:
       keywords: [frontend, component library, design system, static site, browser extension, user interface]
     - name: mobile-desktop
       group: mobile-desktop
-      topics: [android, ios, mobile, mobile-app, flutter, react-native, desktop, desktop-app, electron, tauri, qt, gtk, cross-platform]
+      topics: [android, ios, mobile, mobile-app, flutter, react-native, desktop, desktop-app, electron, electron-app, tauri, tauri-app, qt, gtk, cross-platform]
       keywords: [android, ios, mobile app, desktop app, cross platform]
     - name: systems-lang
       group: systems

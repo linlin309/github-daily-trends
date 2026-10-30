@@ -62,6 +62,9 @@ class SoftwareFilter:
         self.weak_desc = self._compile_words(weak.get("desc_words") or [])
         self.weak_topics = {t.lower() for t in (weak.get("topics") or [])}
         self.weak_min_hits = int(weak.get("min_hits", 2))
+        # 软信号：命中的词全部属于这一组时不在 prefilter 淘汰，
+        # 因为"技能/提示词集合"可能是可执行软件（如 Claude Code 插件、agent-skills）。
+        self.soft_words = {w.lower() for w in (weak.get("soft_words") or [])}
 
         self.positive_weights = dict(cfg.get("positive_weights") or {})
         self.weak_penalty = float(cfg.get("weak_signal_penalty", 0.10))
@@ -76,6 +79,21 @@ class SoftwareFilter:
         self.markup_ratio_max = float(cfg.get("markup_ratio_max", 0.60))
         self.notebook_ratio_gray = float(cfg.get("notebook_ratio_gray", 0.70))
         self.html_ratio_gray = float(cfg.get("html_ratio_gray", 0.80))
+
+    def _only_soft_signals(self, weak_hits: list[str]) -> bool:
+        """命中的弱信号是否全部来自 soft_words（技能/提示词类）。
+
+        weak_hits 形如「名称含「skill」」「描述含「skills」」，取出词再判断。
+        """
+        if not self.soft_words or not weak_hits:
+            return False
+        words = set()
+        for hit in weak_hits:
+            start = hit.find("「")
+            end = hit.find("」", start + 1)
+            if start != -1 and end != -1:
+                words.add(hit[start + 1 : end].lower())
+        return bool(words) and words <= self.soft_words
 
     # ------------------------------------------------------------------ 阶段一
     def prefilter(self, candidate: Candidate) -> FilterResult:
@@ -100,6 +118,11 @@ class SoftwareFilter:
                 weak_hits.append(f"描述含「{word}」")
 
         if len(weak_hits) >= self.weak_min_hits:
+            # 「技能/提示词集合」类仓库在 prefilter 阶段只有名字和描述，
+            # 无法判断它是可执行软件还是一堆 Markdown。这类不在这里杀掉，
+            # 交给 finalize 用 manifest / release 判定（见 weak.soft_words）。
+            if self._only_soft_signals(weak_hits):
+                return FilterResult(KEEP, 0.0, [], weak_hits)
             return FilterResult(DROP, 0.0, [f"弱信号命中 {len(weak_hits)} 个（阈值 {self.weak_min_hits}）: " + "; ".join(weak_hits)])
 
         return FilterResult(KEEP, 0.0, [], weak_hits)
@@ -142,6 +165,13 @@ class SoftwareFilter:
             )
 
         weak_signals.extend(f"topics 含「{t}」" for t in sorted(topics_lower & self.weak_topics))
+        # 技能/提示词类仓库：有可执行产物（依赖清单或 Release）就当软件，
+        # 否则才按弱信号淘汰。纯 Markdown 集合仍然会被挡住。
+        soft_only = weak_signals and all(
+            any(f"「{w}」" in sig for w in self.soft_words) for sig in weak_signals
+        )
+        if soft_only and (candidate.has_manifest or candidate.has_release):
+            weak_signals = []
         if len(weak_signals) >= self.weak_min_hits:
             return FilterResult(DROP, 0.0, [f"弱信号合计 {len(weak_signals)} 个: " + "; ".join(weak_signals)], weak_signals)
 

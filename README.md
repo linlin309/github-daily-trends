@@ -244,7 +244,8 @@ gh workflow run daily-report -f force=true   # 强制重发邮件
 | `sources.languages` | 抓哪些语言页（默认 python/typescript/javascript/go/rust/java） |
 | `sources.search.trigger_*` | Search 兜底的触发门槛（候选 <40 或合格项 <5） |
 | `filter.strong.*` | 强排除：命中即淘汰（`awesome-*`、`cheatsheet`、`tutorial`、中文"教程/面试题"等） |
-| `filter.weak.*` | 弱信号：需 ≥2 个同时命中才淘汰（`book`/`notes`/`skills`/`prompts` 等，避免误杀 bookstack） |
+| `filter.weak.*` | 弱信号：需 ≥2 个同时命中才淘汰（`book`/`notes`/`template` 等，避免误杀 bookstack） |
+| `filter.weak.soft_words` | 模糊地带词（`skill`/`prompts` 等）：命中后**不在 prefilter 淘汰**，等 GitHub API 补全后按「有无依赖清单/Release」判定——技能包是可执行软件，纯 Markdown 集合仍会淘汰 |
 | `filter.markup_ratio_max` | Markdown 等标记语言占比超过 60% → 判为文档/书籍类 |
 | `filter.positive_weights` | software_score 的正向信号权重 |
 | `scoring.weights` | 热度分权重（速度 0.40 / 规模 0.20 / 名次 0.15 / 首次上榜 0.15 / 来源 0.10） |
@@ -255,7 +256,9 @@ gh workflow run daily-report -f force=true   # 强制重发邮件
 | `selection.*_penalty` | 多样性软惩罚与"近期已报过"降权 |
 | `llm.providers` | 主/备 Provider（值来自环境变量） |
 
-想更激进地排除"技能/提示词集合"类仓库？把 `skill`、`skills`、`prompt` 从 `filter.weak` 挪到 `filter.strong` 即可。
+想更严格地排除"技能/提示词集合"类仓库？把 `skill`、`skills`、`prompt` 从 `filter.weak.soft_words` 删掉（或加进 `filter.strong`），它们就会恢复成「2 命中即淘汰」。
+
+分类按 topic 特异性打分：专指 topic 记 1.0，泛化 topic（`docker`/`linux`/`electron` 等，见 `classify.generic_topics`）只记 0.25，取总分最高的类别。避免一个带 `docker` 的 AI 代理被判成 `devops-cloud`。
 
 ---
 
@@ -379,7 +382,7 @@ python scripts/check_llm.py --full     # 真实提示词 + 真实项目：测真
 ## 已知限制（第一版）
 
 1. **不抓 README**：只用 description/topics/语言/数字字段。这显著降低了 Prompt Injection 风险与 token 消耗，代价是对项目细节理解有限。
-2. **技能/提示词集合类仓库**（如 Claude Code skill 包）按"弱信号"处理，个别仍可能入选；可在 `config.yaml` 里加严。
+2. **技能/提示词集合类仓库**（如 Claude Code skill 包）按「有可执行产物就保留」处理：有依赖清单或 Release 视为软件，纯 Markdown 集合仍被淘汰。想更严格可调整 `filter.weak.soft_words`。
 3. **补全有上限**（默认 150 个项目）：超出部分标记为"未核实"并降权，不会挤掉已核实的项目。
 4. **无 token 或额度不足时**自动跳过 `/contents` 与 `/releases`，manifest 判定缺失（不会误判为"非软件"，只是评分偏低）。
 5. **补跑历史日期**只能拿到**当前**的 Trending 数据，报告会标注这一限制。
