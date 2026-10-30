@@ -1,14 +1,9 @@
 name: daily-report
 
-# 自动运行时间见下方 schedule；也支持手动触发（补跑 / 重发 / dry-run）
+# 每天 10:07（北京时间）由外部 cron 服务调用 workflow_dispatch 触发。
+# 不用 GitHub 自带的 schedule：实测调度事件迟到 4.5~5.7 小时且浮动，
+# 保留它只会在下午再跑一次、覆盖当天已发信的报告（见 README「触发方式」）。
 on:
-  schedule:
-    # 10:07（北京时间）= 02:07 UTC。
-    # 用 7 分而不是 0 分：整点是 GitHub 调度最拥堵的时刻，容易被延迟或丢弃。
-    # 注意：GitHub Actions 的 schedule 只支持标准 cron，按 UTC 计算，
-    # 官方文档（events-that-trigger-workflows）里没有 timezone 字段，写了也不会生效。
-    # 报告日期由代码用 ZoneInfo("Asia/Shanghai") 推导，不受此处时区影响。
-    - cron: '7 2 * * *'
   workflow_dispatch:
     inputs:
       date:

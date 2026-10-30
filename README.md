@@ -1,6 +1,6 @@
 # GitHub 每日软件趋势
 
-每天 **10:07（北京时间）** 由定时任务自动跑一次（实测会迟到 4.5～5.7 小时，见下文「已知问题」）：从 GitHub Trending 发现正在升温的项目，用**规则**筛掉教程 / Awesome List / 文档 / 数据集，用 GitHub API 补全客观数据，按**可解释的固定公式**算热度分，做多样性选择，最多挑出 **10 个**真正值得关注的软件项目，让 AI 写一份简洁中文日报，存进仓库形成长期历史，并发一封 HTML 邮件。
+每天 **10:07（北京时间）** 由外部 cron 服务准点触发（实测 10:09 送达）：从 GitHub Trending 发现正在升温的项目，用**规则**筛掉教程 / Awesome List / 文档 / 数据集，用 GitHub API 补全客观数据，按**可解释的固定公式**算热度分，做多样性选择，最多挑出 **10 个**真正值得关注的软件项目，让 AI 写一份简洁中文日报，存进仓库形成长期历史，并发一封 HTML 邮件。
 
 **成本约 0 元/月**（公开仓库 Actions 免费 + 智谱免费模型 + 163 SMTP）。
 
@@ -143,35 +143,27 @@ python -m src.main --send-only --date 2026-09-12     # 只发邮件（读已落�
 
 ## 每天 10:07 是怎么跑的
 
+**触发方式是外部 cron 服务调用 `workflow_dispatch`，不用 GitHub 自带的 `schedule`。**
+
 ```yaml
 on:
-  schedule:
-    - cron: '7 2 * * *'          # 10:07 北京时间 = 02:07 UTC
+  workflow_dispatch:      # 由 cron-job.org 每天 10:07（Asia/Shanghai）POST 触发
 ```
 
-> **`schedule` 只支持标准 cron，且按 UTC 计算。** GitHub 官方文档
-> （events-that-trigger-workflows 的 `schedule` 小节）里**没有 `timezone` 字段**——
-> 写 IANA 时区不会生效，只会让人误以为已经按本地时间调度。所以这里直接写 UTC，
-> 并由代码侧用 `ZoneInfo("Asia/Shanghai")` 决定报告日期。
+> **为什么不用 `schedule`**：实测它的调度事件会迟到 4.5～5.7 小时且浮动
+> （`created_at == started_at`，是调度本身迟到，不是排队等 runner）。
+> 更糟的是，如果保留它做兜底，它会在下午再跑一次，把当天**已经发过信的报告整个覆盖**，
+> 同时把 JSON 里的 `email.ok` 重置为 `false`——2026-10-27 至 10-30 每天都发生。
+> 所以干脆移除，只保留外部触发。
 
-作业步骤：`verify`（跑测试）→ 计算报告日期 → 幂等检查 → 生成报告 → 提交 `reports/` → 发送邮件。
+作业步骤：`verify`（跑测试）→ 计算报告日期 → 幂等检查 → 生成报告 → 提交 `reports/` → 发送邮件 → 记录发信状态。
 
-必须知道的四点：
+必须知道的三点：
 
-1. **日期永远以 `Asia/Shanghai` 计算**（`ZoneInfo`），从不使用 `utcnow().date()`。即使延迟到 UTC 次日才跑，报告日期依然正确。
-2. **正点（`0` 分）是 GitHub 最繁忙的时刻**，定时任务可能延迟几分钟到几十分钟，负载过高时甚至会被丢弃（官方文档明确说明）。所以这里用 `7` 分而不是 `0` 分。
-3. **公开仓库 60 天无活动会自动禁用定时任务**。本仓库每天都在提交，通常不会触发；如果某天没收到邮件，去 Actions 页面点一下 **Enable workflow** 即可。
-4. **定时任务只在默认分支上生效**，且必须先把这个 workflow 文件推上去。
-
-> ⚠️ **已知问题：定时触发可用，但会迟到 4.5～5.7 小时。**
-> 2026-09-12 / 09-13 期间 `schedule` 一次都没触发（多次受控探针验证），从 **09-14 起恢复正常**，
-> daily-report 与 parser-canary 都产生了 `event=schedule` 且 `success` 的运行。
-> 但实测**触发时间显著晚于 cron 设定值**（此前设 04:07 UTC，实际 09:22 / 09:47 UTC，迟 5h15m～5h40m），
-> 所以当前 cron 设的是 10:07（北京）= 02:07 UTC，**实际送达大约在北京 15:20～15:50**，而不是 10:07。
-> 关键细节：`created_at == started_at`，说明是**调度事件本身迟到**，不是排队等 runner。
-> 延迟量在 4h37m～5h40m 之间浮动，因此不能靠"把 cron 往前挪一个固定值"永久对齐。
-> 若要求稳定在某个钟点收到，唯一可靠的做法是用外部 cron 服务调用 `workflow_dispatch`（需一个仓库级 PAT）。
-> 验证方法：`gh run list --json event | grep schedule`，看到 `event=schedule` 才算真正跑通。
+1. **日期永远以 `Asia/Shanghai` 计算**（`ZoneInfo`），从不使用 `utcnow().date()`。
+2. **触发准点依赖外部服务**。cron-job.org 挂了当天就没报告，请务必开启它的失败通知；
+   临时补跑用 Actions 页面的 **Run workflow** 或本机 `gh workflow run daily-report`。
+3. **报告日期由代码推导，与触发时刻无关**，所以任何时间手动补跑都能生成正确日期的报告。
 
 ### 手动触发（补跑 / 重发 / 试跑）
 
@@ -185,11 +177,9 @@ Actions → **daily-report** → **Run workflow**：
 
 同一天重复运行：文件名由日期唯一决定（覆盖同一个文件），**默认不会重复发邮件**（除非 `force=true`）。
 
-### 准点触发（外部 cron 调 `workflow_dispatch`）
+### 触发配置（cron-job.org → `workflow_dispatch`）
 
-`schedule` 的 5 小时延迟无解，唯一能准点的做法是让**仓库之外**的东西到点敲一下
-`workflow_dispatch`。代码零改动——`on.workflow_dispatch` 本来就开着，
-`daily-report` 的 workflow ID 是 `356342825`（用文件名也行）。
+这是**唯一**的定时来源。`daily-report` 的 workflow ID 是 `356342825`（用文件名也行）。
 
 需要准备一件东西：**一个只对这个仓库有 Actions 写权限的 PAT**。
 用 fine-grained token（比 classic 安全，泄露了也只能触发这个仓库的工作流）：
@@ -197,7 +187,7 @@ Actions → **daily-report** → **Run workflow**：
 > GitHub → Settings → Developer settings → **Fine-grained tokens** → Generate new token
 > - Repository access：**Only select repositories** → `linlin309/github-daily-trends`
 > - Permissions → Repository permissions → **Actions: Read and write**
-> - Expiration：建议 1 年，并**在日历里记一条到期提醒**（过期后外部 cron 会静默 401，日报就只剩 `schedule` 的迟到版）
+> - Expiration：建议 1 年，并**在日历里记一条到期提醒**（过期后外部 cron 会静默 401，当天就没有日报了）
 
 先在本机验一次（`$PAT` 换成刚生成的 token）：
 
@@ -225,12 +215,13 @@ curl -i -X POST   -H "Accept: application/vnd.github+json"   -H "Authorization: 
 gh run list --workflow=daily-report --limit 3   --json databaseId,event,createdAt,conclusion
 ```
 
-**为什么保留 `schedule`**：外部服务挂了还有兜底。两者同一天都跑不会重复发邮件
-（幂等检查在发信前拦住），代价只是多跑一次采集、多花一次 GitHub API 配额。
-但如果外部 cron 准点跑完、`schedule` 几小时后才到，那份数据会**覆盖**当天的报告文件——
-`reports/YYYY-MM-DD.md` 的内容会变成延迟那次抓到的 trending，`git` 里也会多一条
-`report: <同一天>` 的提交。要避免这种"晚间重写"，就在外部 cron 稳定跑通几周后
-把 `daily-report.yml` 里的 `schedule:` 整段删掉。
+**失败通知务必开启**。这是唯一能发现「cron-job.org 挂了」或「PAT 过期」的手段——
+两者都会让当天的日报静默消失。临时补跑：
+
+```bash
+gh workflow run daily-report            # 按当天日期补跑
+gh workflow run daily-report -f force=true   # 强制重发邮件
+```
 
 > 更在意 PAT 不落到第三方手里的话，可以用 **Cloudflare Workers Cron Triggers**
 > （免费额度足够，PAT 存在自己账号的 Worker secret 里），只是要多写十几行 Worker 代码。
