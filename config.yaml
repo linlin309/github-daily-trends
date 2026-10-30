@@ -121,11 +121,14 @@ filter:
       - '学习资料|学习资源|学习路线|教程合集|面试题|面试资料|资源合集|资源集合|电子书|读书笔记|笔记合集|由浅入深'
 
   # 弱信号：单个不足以排除，需 ≥2 个同时命中。
-  # soft_words 里的词属于"可能是软件、也可能是文档"的模糊地带（技能包/提示词集合）。
+  #
+  # soft_words 是"可能是软件、也可能是文档"的模糊地带，默认包含全部弱信号词。
   # 命中它们的项目不在 prefilter 淘汰，而是等 GitHub API 补全后再判定：
-  # 有依赖清单或 Release → 当软件保留；两者都没有 → 仍按弱信号淘汰。
+  #   有依赖清单或 Release → 当软件保留；两者都没有 → 仍按弱信号淘汰。
+  # 这样 agent-skills（可执行插件）能进来，纯 Markdown 的笔记/清单照样被挡。
+  # 真正无条件排除的是上面 strong 段（教程、Awesome List、书籍、数据集等）。
   weak:
-    soft_words: [skill, skills, prompt, prompts, agent-skills, ai-skills, claude-skills, claude-code-plugin, claude-plugin, prompt-engineering, cursor-rules]
+    soft_words: [agent-skills, ai-skills, awesome, boilerplate, book, books, cheatsheet, claude-code-plugin, claude-plugin, claude-skills, collection, curated, cursor-rules, doc, docs, examples, guide, guides, handbook, learn, learning, list, list of, lists, lists of, manual, note, notes, prompt, prompt-engineering, prompts, reference, resource, resources, roadmap, sample, samples, skill, skills, starter, study, template, templates, tutorial, tutorials]
     name_words: [book, books, notes, note, list, lists, docs, doc, guide, guides, reference, examples, sample, samples, template, templates, boilerplate, starter, collection, resource, resources, learn, learning, study, awesome, handbook, manual, skill, skills]
     desc_words: [book, books, notes, list of, lists of, guide, guides, tutorial, tutorials, learning, study, roadmap, awesome, resources, examples, collection, handbook, cheatsheet, skill, skills, prompt, prompts]
     topics: [learning, study, guide, guides, handbook, reference, manual, template, boilerplate, starter, collection, list, curated, notes, resources, skills, claude-skills, claude-code-plugin, claude-plugin, agent-skills, ai-skills, prompts, prompt-engineering, cursor-rules]

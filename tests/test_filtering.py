@@ -78,9 +78,12 @@ def test_single_weak_signal_is_kept_as_gray_signal(flt):
     assert result.weak_signals, "单一弱信号应被记录"
 
 
-def test_two_weak_signals_drop(flt):
+def test_two_weak_signals_pass_prefilter_but_drop_without_artifacts(flt):
+    """笔记/清单类弱信号不再在 prefilter 淘汰（可能是有依赖清单的软件），
+    但没有依赖清单也没有 Release 时，finalize 仍会排除。"""
     c = make("someone/notes-list", description="My personal notes and a list of resources")
-    assert flt.prefilter(c).status == DROP
+    assert flt.prefilter(c).status == KEEP
+    assert flt.finalize(c, today=TODAY).status == DROP
 
 
 def test_skill_bundle_with_two_signals_dropped(flt):

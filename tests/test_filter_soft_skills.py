@@ -63,13 +63,20 @@ def test_skill_repo_without_manifest_is_dropped(flt):
     assert result.status == DROP, result.reasons
 
 
-def test_non_soft_weak_signals_still_drop(flt):
-    """非 soft 词（template/tutorial）不受放行逻辑影响，达到阈值照旧淘汰。"""
+def test_template_repo_passes_prefilter(flt):
+    """template/tutorial 等泛词现在也属于 soft：prefilter 放行，等 finalize 判定。"""
     result = flt.prefilter(make("web-template", "A template and a tutorial for apps"))
-    assert result.status == DROP, result.reasons
+    assert result.status == KEEP, result.reasons
 
 
-def test_mixed_signals_still_drop(flt):
-    """soft 词 + 非 soft 词混合时不放行：只要有一个非 soft 信号就照常淘汰。"""
-    result = flt.prefilter(make("prompt-template", "A prompt template collection"))
-    assert result.status == DROP, result.reasons
+def test_template_repo_dropped_without_artifacts(flt):
+    """没有依赖清单也没有 Release 的模板仓库，finalize 仍然淘汰。"""
+    c = make("web-template", "A template and a tutorial for apps", topics=["template"])
+    c.weak_signals = ["名称含「template」", "描述含「tutorial」"]
+    assert flt.finalize(c, today=date(2026, 10, 30)).status == DROP
+
+
+def test_strong_rules_still_hard_drop(flt):
+    """strong 段是硬排除，不受 soft 放宽影响。"""
+    assert flt.prefilter(make("awesome-rust", "A curated list of rust libraries")).status == DROP
+    assert flt.prefilter(make("my-tutorial", "Learn python")).status == DROP
