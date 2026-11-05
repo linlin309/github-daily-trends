@@ -40,8 +40,8 @@
     "notes": []
   },
   "email": {
-    "ok": false,
-    "attempted_at": null
+    "ok": true,
+    "attempted_at": "2026-11-05T10:09:56+08:00"
   },
   "degraded": [],
   "summary": {
