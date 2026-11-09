@@ -41,8 +41,8 @@
     "notes": []
   },
   "email": {
-    "ok": false,
-    "attempted_at": null
+    "ok": true,
+    "attempted_at": "2026-11-09T10:09:11+08:00"
   },
   "degraded": [
     "部分来源采集失败：lang:javascript: Trending(daily) 解析出行数异常: 4（期望 5-60）"
