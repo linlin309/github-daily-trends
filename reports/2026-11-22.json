@@ -40,8 +40,8 @@
     "notes": []
   },
   "email": {
-    "ok": false,
-    "attempted_at": null
+    "ok": true,
+    "attempted_at": "2026-11-22T10:14:08+08:00"
   },
   "degraded": [
     "AI 分析不可用（zhipu: HTTP 502: message=<html> <head><title>502 Bad Gateway</title></head> <body bgcolor=\"white\"> <center><h1>502 Bad Gateway</h1></center> <hr><center>alibaba-ga</center> </body> </html>; zhipu-alt-model: 响应中没有文本内容（finish_reason=length）），本次为纯数据日报"
